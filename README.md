@@ -6,11 +6,11 @@ The official product name is NOTE. This repository covers Promotion; it does not
 
 ## Product status
 
+This repository contains the implementation specification for NOTE's Promotion product. The name is NOTE. The MVP scope and acceptance criteria are defined below.
+
 ## Interactive demo
 
 A runnable front-end prototype is in [`demo/`](demo/README.md). It uses fictional opportunities and illustrative metrics; approval controls record local demo decisions and do not contact anyone, publish content, or spend money.
-
-This repository contains the implementation specification for NOTE's Promotion product. The name is NOTE. The MVP scope and acceptance criteria are defined below.
 
 ## 1. Product vision
 
