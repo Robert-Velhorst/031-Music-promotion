@@ -1,14 +1,16 @@
-# Music Promotion
+# NOTE — Music Promotion
 
-An artist-first promotion autopilot for independent musicians, producers, and other music creators.
+NOTE is an artist-first platform for independent music creators. This repository specifies NOTE's Promotion pillar and its first implementation scope.
+
+The official product name is NOTE. This repository covers Promotion; it does not define or implement all ten NOTE platform pillars. The Promotion MVP remains artist-first and does not add recipient accounts or a curator-facing submission portal.
 
 ## Product status
 
-This repository currently contains the product specification for the first implementation. The product name is provisional.
+This repository contains the implementation specification for NOTE's Promotion product. The name is NOTE. The MVP scope and acceptance criteria are defined below.
 
 ## 1. Product vision
 
-Music Promotion should make professional music promotion accessible to creators who make and release music but do not have a label, promotion team, large network, or live-performance career.
+NOTE's Promotion pillar should make professional music promotion accessible to creators who make and release music but do not have a label, promotion team, large network, or live-performance career.
 
 Today, music promotion is fragmented. Artists must discover suitable YouTube channels, radio stations, playlists, blogs, podcasts, creators, communities, and submission platforms; understand different requirements; write messages; complete forms; follow up; and manually combine the resulting statistics and income reports. This work is repetitive, difficult to track, and often produces no response.
 
