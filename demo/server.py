@@ -22,6 +22,7 @@ MAX_STATE_BYTES = 1_048_576
 MAX_CAMPAIGNS = 100
 MAX_APPROVALS = 200
 MAX_AUDIT_EVENTS = 200
+MAX_OUTCOMES = 1000
 ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 
 
@@ -60,88 +61,184 @@ def _is_text_list(value, maximum_items: int, maximum_length: int) -> bool:
     )
 
 
+def _valid_iso_date(value: str) -> bool:
+    if not value:
+        return True
+    try:
+        return date.fromisoformat(value).isoformat() == value
+    except ValueError:
+        return False
+
+
+def _valid_url(value: str) -> bool:
+    if not value:
+        return True
+    if len(value) > 2000 or value != value.strip() or any(ord(char) <= 32 for char in value):
+        return False
+    try:
+        parsed = urlsplit(value)
+        parsed.port  # Force validation of malformed port values.
+    except ValueError:
+        return False
+    return (
+        parsed.scheme.lower() == "https"
+        and bool(parsed.hostname)
+        and parsed.username is None
+        and parsed.password is None
+    )
+
+
 def validate_state(state) -> bool:
-    """Validate the small, local demo state before storing it as JSON."""
+    """Validate local workspace state before storing it as JSON."""
     if not isinstance(state, dict):
         return False
 
     artist = state.get("artist")
     if not isinstance(artist, dict) or not all(
         _is_text(artist.get(field), maximum)
-        for field, maximum in (("name", 100), ("genre", 80), ("song", 100))
+        for field, maximum in (("name", 100), ("genre", 80))
     ):
+        return False
+    if "song" in artist and not _is_text(artist["song"], 100, allow_empty=True):
+        return False
+
+    profile = state.get("profile", {})
+    if not isinstance(profile, dict):
+        return False
+    if not all(
+        _is_text(profile.get(field, ""), maximum, allow_empty=True)
+        for field, maximum in (
+            ("bio", 1200), ("homeTerritory", 2), ("website", 300),
+            ("socialProfiles", 1000), ("distributor", 120), ("publisher", 120),
+            ("proCmo", 120), ("neighbouringRights", 120),
+            ("prohibitedAssociations", 1000), ("contactPreferences", 500),
+        )
+    ):
+        return False
+    if profile.get("homeTerritory") and not re.fullmatch(r"[A-Z]{2}", profile["homeTerritory"]):
+        return False
+    if not _valid_url(profile.get("website", "")):
+        return False
+    languages = profile.get("languages", [])
+    if not _is_text_list(languages, 20, 60) or len(languages) != len(set(languages)):
+        return False
+    profile_territories = profile.get("territories", [])
+    if not isinstance(profile_territories, list) or len(profile_territories) > 50 or not all(
+        isinstance(code, str) and re.fullmatch(r"[A-Z]{2}", code) for code in profile_territories
+    ) or len(profile_territories) != len(set(profile_territories)):
+        return False
+    social_profiles = profile.get("socialProfiles", "")
+    if social_profiles and any(not _valid_url(item.strip()) for item in social_profiles.splitlines() if item.strip()):
         return False
 
     release = state.get("release")
     if not isinstance(release, dict):
         return False
+    release_text_fields = (
+        ("id", 120, False), ("title", 100, False), ("version", 80, True),
+        ("kind", 20, False), ("releaseDate", 10, True), ("duration", 8, True),
+        ("language", 60, True), ("isrc", 12, True), ("description", 500, True),
+        ("contributors", 1000, True), ("iswc", 30, True), ("upc", 14, True),
+        ("distributor", 120, True), ("publisher", 120, True), ("proCmo", 120, True),
+        ("masterOwnership", 300, True), ("compositionSplits", 1000, True),
+        ("sampleStatus", 300, True), ("rightsEvidenceNote", 500, True), ("publicLink", 500, True),
+    )
     if not all(
         _is_text(release.get(field), maximum, allow_empty=allow_empty)
-        for field, maximum, allow_empty in (
-            ("id", 120, False),
-            ("title", 100, False),
-            ("version", 80, True),
-            ("kind", 20, False),
-            ("releaseDate", 10, True),
-            ("duration", 8, True),
-            ("language", 60, True),
-            ("isrc", 12, True),
-            ("description", 500, True),
-            ("contributors", 1000, True),
-        )
+        for field, maximum, allow_empty in release_text_fields
     ):
         return False
     if release["kind"] not in {"Single", "EP", "Album", "Compilation", "Other"}:
         return False
-    if release["releaseDate"]:
-        try:
-            if date.fromisoformat(release["releaseDate"]).isoformat() != release["releaseDate"]:
-                return False
-        except ValueError:
-            return False
+    if not _valid_iso_date(release["releaseDate"]):
+        return False
     if release["duration"] and not re.fullmatch(r"(?:[0-5]?\d):[0-5]\d", release["duration"]):
         return False
     if release["isrc"] and not re.fullmatch(r"[A-Z]{2}[A-Z0-9]{3}\d{7}", release["isrc"]):
         return False
+    if release["upc"] and not re.fullmatch(r"\d{8,14}", release["upc"]):
+        return False
+    if not _valid_url(release["publicLink"]):
+        return False
     if not isinstance(release.get("explicit"), bool) or not isinstance(release.get("rightsConfirmed"), bool):
         return False
-    territories = release.get("territories")
-    if not isinstance(territories, list) or len(territories) > 50 or not all(
-        isinstance(code, str) and re.fullmatch(r"[A-Z]{2}", code) for code in territories
-    ):
+    release_territories = release.get("territories")
+    if not isinstance(release_territories, list) or len(release_territories) > 50 or not all(
+        isinstance(code, str) and re.fullmatch(r"[A-Z]{2}", code) for code in release_territories
+    ) or len(release_territories) != len(set(release_territories)):
+        return False
+    if not _is_text_list(release.get("permittedUses", []), 20, 80):
+        return False
+    if profile_territories and any(code not in profile_territories for code in release_territories):
         return False
 
     if not isinstance(state.get("cleanVersion"), bool):
         return False
+    if not isinstance(state.get("readinessRun"), (dict, type(None))):
+        return False
     if not _is_text_list(state.get("savedOpportunityIds"), 100, 100):
+        return False
+    if not _is_text_list(state.get("suppressedOpportunityIds", []), 100, 100):
+        return False
+    if set(state.get("savedOpportunityIds", [])) & set(state.get("suppressedOpportunityIds", [])):
         return False
 
     campaigns = state.get("campaigns")
     if not isinstance(campaigns, list) or len(campaigns) > MAX_CAMPAIGNS:
         return False
+    campaign_ids = set()
+    valid_campaign_statuses = {"Planning", "Active", "Paused", "Stopped", "Completed"}
     for campaign in campaigns:
         if not isinstance(campaign, dict):
             return False
         if not all(
             _is_text(campaign.get(field), maximum)
             for field, maximum in (
-                ("id", 120),
-                ("title", 120),
-                ("release", 100),
-                ("goal", 300),
-                ("status", 20),
-                ("updated", 40),
-                ("owner", 100),
-                ("releaseDate", 60),
+                ("id", 120), ("title", 120), ("release", 100), ("goal", 300),
+                ("status", 20), ("updated", 40), ("owner", 100), ("releaseDate", 60),
             )
         ):
             return False
-        if campaign["status"] not in {"Planning", "Active", "Completed"}:
+        if campaign["id"] in campaign_ids or campaign["status"] not in valid_campaign_statuses:
             return False
-        completion = campaign.get("completion")
+        campaign_ids.add(campaign["id"])
+        completion = campaign.get("completion", 0)
         if isinstance(completion, bool) or not isinstance(completion, int) or not 0 <= completion <= 100:
             return False
         if not _is_text_list(campaign.get("channels"), 20, 80):
+            return False
+        if not _is_text(campaign.get("exclusions", ""), 1000, allow_empty=True):
+            return False
+        if not _is_text(campaign.get("startDate", ""), 10, allow_empty=True) or not _valid_iso_date(campaign.get("startDate", "")):
+            return False
+        if not _is_text(campaign.get("endDate", ""), 10, allow_empty=True) or not _valid_iso_date(campaign.get("endDate", "")):
+            return False
+        if campaign.get("startDate") and campaign.get("endDate") and campaign["endDate"] < campaign["startDate"]:
+            return False
+        territories = campaign.get("territories", [])
+        if not isinstance(territories, list) or len(territories) > 50 or not all(
+            isinstance(code, str) and re.fullmatch(r"[A-Z]{2}", code) for code in territories
+        ) or len(territories) != len(set(territories)):
+            return False
+        campaign_languages = campaign.get("languages", [])
+        if not _is_text_list(campaign_languages, 20, 60):
+            return False
+        target = campaign.get("plannedQualifiedActions")
+        if target is not None and (isinstance(target, bool) or not isinstance(target, int) or not 0 <= target <= 10000):
+            return False
+        budget = campaign.get("budgetCap", 0)
+        if isinstance(budget, bool) or not isinstance(budget, (int, float)) or not 0 <= budget <= 1000000:
+            return False
+        if campaign.get("budgetCurrency", "EUR") not in {"EUR", "GBP", "USD"}:
+            return False
+        if not isinstance(campaign.get("freeActionPermission", False), bool) or not isinstance(campaign.get("autopilotAuthorized", False), bool):
+            return False
+        if campaign["release"] == release["title"]:
+            if profile_territories and any(code not in profile_territories for code in territories):
+                return False
+            if any(code not in release_territories for code in territories):
+                return False
+        if any(language not in languages for language in campaign_languages) and languages:
             return False
 
     approvals = state.get("approvals")
@@ -154,15 +251,9 @@ def validate_state(state) -> bool:
         if not all(
             _is_text(approval.get(field), maximum)
             for field, maximum in (
-                ("id", 120),
-                ("kind", 80),
-                ("icon", 40),
-                ("title", 180),
-                ("description", 500),
-                ("detail", 800),
-                ("requestedBy", 100),
-                ("requested", 60),
-                ("status", 24),
+                ("id", 120), ("kind", 80), ("icon", 40), ("title", 180),
+                ("description", 500), ("detail", 800), ("requestedBy", 100),
+                ("requested", 60), ("status", 24),
             )
         ):
             return False
@@ -182,8 +273,35 @@ def validate_state(state) -> bool:
         ):
             return False
 
-    return True
+    outcomes = state.get("outcomes", [])
+    if not isinstance(outcomes, list) or len(outcomes) > MAX_OUTCOMES:
+        return False
+    outcome_ids = set()
+    valid_outcome_kinds = {"Response", "Accepted", "Scheduled", "Published", "Aired", "Placement", "Usage", "Revenue", "Expense"}
+    valid_sources = {"Artist-entered", "Imported", "Estimated"}
+    valid_verification = {"Unverified", "Evidence noted", "Verified"}
+    for outcome in outcomes:
+        if not isinstance(outcome, dict) or not all(
+            _is_text(outcome.get(field), maximum)
+            for field, maximum in (("id", 120), ("campaignId", 120), ("date", 10), ("kind", 40), ("source", 30), ("verification", 30), ("currency", 3))
+        ):
+            return False
+        if outcome["id"] in outcome_ids or outcome["campaignId"] not in campaign_ids or not _valid_iso_date(outcome["date"]):
+            return False
+        outcome_ids.add(outcome["id"])
+        if outcome["kind"] not in valid_outcome_kinds or outcome["source"] not in valid_sources or outcome["verification"] not in valid_verification:
+            return False
+        if outcome["currency"] not in {"EUR", "GBP", "USD"}:
+            return False
+        amount = outcome.get("amount", "")
+        if not _is_text(amount, 30, allow_empty=True):
+            return False
+        if amount and (not re.fullmatch(r"(?:0|[1-9]\d{0,8})(?:\.\d{1,2})?", amount) or float(amount) > 100000000):
+            return False
+        if not _is_text(outcome.get("evidence", ""), 500, allow_empty=True) or not _is_text(outcome.get("notes", ""), 800, allow_empty=True):
+            return False
 
+    return True
 
 def create_handler(database_path: Path):
     database_path = Path(database_path)
