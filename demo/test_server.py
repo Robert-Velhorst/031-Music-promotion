@@ -6,7 +6,7 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from server import MAX_STATE_BYTES, create_server
+from server import APP_DIR, MAX_STATE_BYTES, create_server
 
 
 SAMPLE_STATE = {
@@ -73,6 +73,17 @@ class StateApiTests(unittest.TestCase):
         self.assertEqual(body, {"ok": True})
         self.assertEqual(headers.get("X-Content-Type-Options"), "nosniff")
         self.assertEqual(headers.get("X-Frame-Options"), "DENY")
+
+    def test_server_delivers_the_app_and_its_local_script(self):
+        with urlopen(f"{self.base_url}/", timeout=3) as response:
+            self.assertEqual(response.status, 200)
+            page = response.read().decode("utf-8")
+        self.assertIn("NOTE — Artist workspace", page)
+
+        with urlopen(f"{self.base_url}/app.js", timeout=3) as response:
+            self.assertEqual(response.status, 200)
+            script = response.read().decode("utf-8")
+        self.assertIn("loadServerState();", script)
 
     def test_state_is_empty_until_first_save(self):
         status, _, body = self.request("GET", "/api/state")
@@ -145,6 +156,10 @@ class StateApiTests(unittest.TestCase):
     def test_server_refuses_to_bind_to_a_public_interface(self):
         with self.assertRaisesRegex(ValueError, "only bind to localhost"):
             create_server(Path(self.temp_dir.name) / "public.sqlite3", host="0.0.0.0", port=0)
+
+    def test_server_refuses_database_inside_the_served_demo_folder(self):
+        with self.assertRaisesRegex(ValueError, "outside the served demo folder"):
+            create_server(APP_DIR / "exposed.sqlite3", port=0)
 
 
 if __name__ == "__main__":
