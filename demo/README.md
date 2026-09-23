@@ -10,11 +10,13 @@ Requires Python 3.10 or later; there are no third-party dependencies.
 python3 server.py
 ```
 
-Open <http://127.0.0.1:8000>. To use a different local port or database file:
+Open <http://127.0.0.1:8000>. To use a different local port:
 
 ```sh
-python3 server.py --port 8010 --db ./note-demo.sqlite3
+python3 server.py --port 8010
 ```
+
+An optional `--db` path must be outside the `demo/` folder, which the service exposes as static files.
 
 Run the service checks with:
 
