@@ -27,7 +27,7 @@ python3 -m unittest -v test_server.py
 ## Included
 
 - Overview dashboard, release readiness, and sample reporting.
-- Campaign planning, editable Song Passport details, and saved opportunities.
+- Campaign planning, an editable Song Passport with recording identifiers, contributor notes, and self-reported rights confirmation, plus saved opportunities.
 - Approval review and decision history.
 - Browser storage fallback plus a local SQLite save service.
 - Sample CSV report export.
