@@ -11,7 +11,13 @@ from server import APP_DIR, MAX_STATE_BYTES, create_server, validate_state
 
 
 SAMPLE_STATE = {
-    "artist": {"name": "Demo Artist", "genre": "Indie pop", "song": "Demo Track"},
+    "artist": {"name": "Demo Artist", "genre": "Indie pop"},
+    "profile": {
+        "bio": "Independent artist.", "homeTerritory": "GB", "languages": ["English"],
+        "territories": ["GB"], "website": "", "socialProfiles": "", "distributor": "",
+        "publisher": "", "proCmo": "", "neighbouringRights": "",
+        "prohibitedAssociations": "", "contactPreferences": "Artist approval before contact.",
+    },
     "release": {
         "id": "demo-release",
         "title": "Demo Track",
@@ -23,12 +29,25 @@ SAMPLE_STATE = {
         "language": "English",
         "territories": ["GB"],
         "isrc": "",
+        "iswc": "",
+        "upc": "",
+        "publicLink": "",
         "description": "A sample artist-provided track description.",
         "contributors": "Demo Artist — songwriter; Other Artist — producer",
+        "distributor": "",
+        "publisher": "",
+        "proCmo": "",
+        "masterOwnership": "Artist-reported; not verified",
+        "compositionSplits": "",
+        "sampleStatus": "Not declared",
+        "permittedUses": ["Editorial consideration"],
+        "rightsEvidenceNote": "",
         "rightsConfirmed": True,
     },
     "cleanVersion": False,
+    "readinessRun": None,
     "savedOpportunityIds": ["source-1"],
+    "suppressedOpportunityIds": [],
     "campaigns": [
         {
             "id": "campaign-1",
@@ -40,9 +59,20 @@ SAMPLE_STATE = {
             "updated": "Just now",
             "channels": ["Editorial"],
             "owner": "Demo Artist",
-            "releaseDate": "Date to be confirmed",
+            "releaseDate": "23 Oct 2026",
+            "startDate": "2026-09-25",
+            "endDate": "2026-11-06",
+            "territories": ["GB"],
+            "languages": ["English"],
+            "exclusions": "No pay-to-play or guaranteed-placement services.",
+            "plannedQualifiedActions": None,
+            "budgetCap": 0,
+            "budgetCurrency": "EUR",
+            "freeActionPermission": False,
+            "autopilotAuthorized": False,
         }
     ],
+    "outcomes": [],
     "approvals": [],
     "audit": [],
 }
@@ -147,12 +177,70 @@ class StateApiTests(unittest.TestCase):
         invalid_type["release"]["kind"] = "Playlist"
         invalid_date = copy.deepcopy(SAMPLE_STATE)
         invalid_date["release"]["releaseDate"] = "next Friday"
+        impossible_date = copy.deepcopy(SAMPLE_STATE)
+        impossible_date["release"]["releaseDate"] = "2026-02-31"
         oversized_description = copy.deepcopy(SAMPLE_STATE)
         oversized_description["release"]["description"] = "x" * 501
 
         self.assertFalse(validate_state(invalid_type))
         self.assertFalse(validate_state(invalid_date))
+        self.assertFalse(validate_state(impossible_date))
         self.assertFalse(validate_state(oversized_description))
+
+    def test_campaign_boundaries_must_fit_artist_and_release_permissions(self):
+        invalid_territory = copy.deepcopy(SAMPLE_STATE)
+        invalid_territory["campaigns"][0]["territories"] = ["US"]
+        invalid_language = copy.deepcopy(SAMPLE_STATE)
+        invalid_language["campaigns"][0]["languages"] = ["French"]
+
+        self.assertFalse(validate_state(invalid_territory))
+        self.assertFalse(validate_state(invalid_language))
+
+    def test_artist_and_release_links_require_valid_https_urls(self):
+        invalid_profile_url = copy.deepcopy(SAMPLE_STATE)
+        invalid_profile_url["profile"]["website"] = "https://"
+        credential_url = copy.deepcopy(SAMPLE_STATE)
+        credential_url["release"]["publicLink"] = "https://user:pass@example.test/track"
+        invalid_port = copy.deepcopy(SAMPLE_STATE)
+        invalid_port["release"]["publicLink"] = "https://example.test:invalid/track"
+
+        self.assertFalse(validate_state(invalid_profile_url))
+        self.assertFalse(validate_state(credential_url))
+        self.assertFalse(validate_state(invalid_port))
+
+    def test_campaign_and_outcome_records_round_trip_with_provenance(self):
+        state = copy.deepcopy(SAMPLE_STATE)
+        campaign = state["campaigns"][0]
+        campaign.update({
+            "status": "Paused", "budgetCap": 25.5, "budgetCurrency": "GBP",
+            "freeActionPermission": True, "autopilotAuthorized": False,
+        })
+        state["outcomes"] = [
+            {
+                "id": "reply-1", "campaignId": campaign["id"], "date": "2026-10-24",
+                "kind": "Response", "source": "Artist-entered", "verification": "Evidence noted",
+                "currency": "EUR", "amount": "", "evidence": "Reply recorded by the artist", "notes": "Positive response",
+            },
+            {
+                "id": "revenue-1", "campaignId": campaign["id"], "date": "2026-10-25",
+                "kind": "Revenue", "source": "Imported", "verification": "Verified",
+                "currency": "GBP", "amount": "10.50", "evidence": "Imported statement line", "notes": "",
+            },
+        ]
+        self.assertTrue(validate_state(state))
+        status, _, saved = self.request("PUT", "/api/state", state)
+        self.assertEqual(status, 200)
+        self.assertTrue(saved["saved"])
+        status, _, loaded = self.request("GET", "/api/state")
+        self.assertEqual(status, 200)
+        self.assertEqual(loaded["state"], state)
+
+        duplicate = copy.deepcopy(state)
+        duplicate["outcomes"][1]["id"] = duplicate["outcomes"][0]["id"]
+        invalid_source = copy.deepcopy(state)
+        invalid_source["outcomes"][0]["source"] = "Unknown"
+        self.assertFalse(validate_state(duplicate))
+        self.assertFalse(validate_state(invalid_source))
 
     def test_oversized_request_is_rejected_before_reading_body(self):
         request = Request(
