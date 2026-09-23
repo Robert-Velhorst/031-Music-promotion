@@ -1,26 +1,37 @@
 # NOTE — Promotion demo
 
-A small, self-contained interactive demo of NOTE’s artist-first Promotion workspace.
+This is the first persistent product slice for NOTE’s artist-first Promotion workflow. The product specification remains in the repository root.
 
 ## Run locally
 
-From this folder, start a local static server:
+Requires Python 3.10 or later; there are no third-party dependencies.
 
 ```sh
-python3 -m http.server 8000
+python3 server.py
 ```
 
-Then open <http://localhost:8000>.
+Open <http://127.0.0.1:8000>. To use a different local port or database file:
 
-## Included flows
+```sh
+python3 server.py --port 8010 --db ./note-demo.sqlite3
+```
 
-- Overview dashboard with a release readiness checklist and clearly marked sample reporting.
-- Campaign drafts with filtering and a campaign planning summary.
-- Song Passport with editable release details and a sample readiness update.
-- Fictional opportunities with fit explanations, saved state, and a review request flow.
-- An approval inbox that records demo decisions locally.
-- Reports, a sample CSV export, and settings for team roles and action boundaries.
+Run the service checks with:
 
-## Demo boundaries
+```sh
+python3 -m unittest -v test_server.py
+```
 
-This is a frontend-only demo. It has no backend, connected services, real contacts, real opportunities, payments, publishing, or outbound messaging. Approvals, edits, and saved items are stored in your browser’s local storage. All performance numbers and opportunity listings are illustrative sample data.
+## Included
+
+- Overview dashboard, release readiness, and sample reporting.
+- Campaign planning, editable Song Passport details, and saved opportunities.
+- Approval review and decision history.
+- Browser storage fallback plus a local SQLite save service.
+- Sample CSV report export.
+
+## Local-demo boundaries
+
+All opportunities and reporting values are fictional examples. The local service binds only to `127.0.0.1` by default; it has no accounts, authentication, encryption, or external integrations. Do not expose it to the internet or enter sensitive, legal, financial, or unreleased artist information. It never sends outreach, publishes content, spends money, or commits anyone to terms. Real-world execution remains disabled.
+
+SQLite data is stored outside the app’s served files, by default under `~/.local/share/note-demo/` (or `$XDG_DATA_HOME/note-demo/`).
