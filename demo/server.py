@@ -9,7 +9,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sqlite3
+from datetime import date
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -67,6 +69,45 @@ def validate_state(state) -> bool:
     if not isinstance(artist, dict) or not all(
         _is_text(artist.get(field), maximum)
         for field, maximum in (("name", 100), ("genre", 80), ("song", 100))
+    ):
+        return False
+
+    release = state.get("release")
+    if not isinstance(release, dict):
+        return False
+    if not all(
+        _is_text(release.get(field), maximum, allow_empty=allow_empty)
+        for field, maximum, allow_empty in (
+            ("id", 120, False),
+            ("title", 100, False),
+            ("version", 80, True),
+            ("kind", 20, False),
+            ("releaseDate", 10, True),
+            ("duration", 8, True),
+            ("language", 60, True),
+            ("isrc", 12, True),
+            ("description", 500, True),
+            ("contributors", 1000, True),
+        )
+    ):
+        return False
+    if release["kind"] not in {"Single", "EP", "Album", "Compilation", "Other"}:
+        return False
+    if release["releaseDate"]:
+        try:
+            if date.fromisoformat(release["releaseDate"]).isoformat() != release["releaseDate"]:
+                return False
+        except ValueError:
+            return False
+    if release["duration"] and not re.fullmatch(r"(?:[0-5]?\d):[0-5]\d", release["duration"]):
+        return False
+    if release["isrc"] and not re.fullmatch(r"[A-Z]{2}[A-Z0-9]{3}\d{7}", release["isrc"]):
+        return False
+    if not isinstance(release.get("explicit"), bool) or not isinstance(release.get("rightsConfirmed"), bool):
+        return False
+    territories = release.get("territories")
+    if not isinstance(territories, list) or len(territories) > 50 or not all(
+        isinstance(code, str) and re.fullmatch(r"[A-Z]{2}", code) for code in territories
     ):
         return False
 
