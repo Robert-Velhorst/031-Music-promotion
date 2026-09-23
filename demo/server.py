@@ -289,6 +289,8 @@ def create_server(database_path: Path, host: str = "127.0.0.1", port: int = 8000
     if host not in ALLOWED_HOSTS:
         raise ValueError("The demo server may only bind to localhost or 127.0.0.1")
     database_path = Path(database_path).expanduser().resolve()
+    if database_path.is_relative_to(APP_DIR):
+        raise ValueError("The SQLite file must be stored outside the served demo folder")
     initialize_database(database_path)
     return ThreadingHTTPServer((host, port), create_handler(database_path))
 
