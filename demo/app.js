@@ -3,7 +3,8 @@
 
   const STORAGE_KEY = "note-promotion-demo-v1";
   const seed = {
-    artist: { name: "Mara Bloom", genre: "Indie pop", song: "Glasshouse" },
+    artist: { name: "Mara Bloom", genre: "Indie pop" },
+    release: { id: "glasshouse", title: "Glasshouse", version: "", kind: "Single", releaseDate: "2026-10-23", duration: "3:42", explicit: false, language: "English", territories: ["GB"], isrc: "", description: "A late-night song about finding your way back to yourself.", contributors: "Mara Bloom — songwriter, vocals; Ellis Park — producer", rightsConfirmed: true },
     cleanVersion: false,
     savedOpportunityIds: ["new-frequencies", "tidepool", "signal-bloom", "porchlight"],
     campaigns: [
@@ -30,21 +31,31 @@
     { id: "soft-static", initials: "ss", name: "Soft Static", category: "Radio", type: "Podcast & radio", fit: 76, description: "A monthly conversation and listening session about how new independent music gets made.", tags: ["Story fit", "Interview format", "No fee listed"], why: ["Focuses on artist-led stories", "Pairs a conversation with a short music feature", "Review interview time commitment before replying"], source: "Fictional example source · sample data" }
   ];
 
+  function mergeState(stored) {
+    const source = stored && typeof stored === "object" ? stored : {};
+    const artist = { ...seed.artist, ...(source.artist || {}) };
+    const legacyTitle = artist.song;
+    delete artist.song;
+    const release = { ...seed.release, ...(source.release || {}) };
+    if (!source.release && legacyTitle) release.title = legacyTitle;
+    release.territories = Array.isArray(release.territories) ? release.territories : [...seed.release.territories];
+    return {
+      ...JSON.parse(JSON.stringify(seed)),
+      ...source,
+      artist,
+      release,
+      campaigns: Array.isArray(source.campaigns) ? source.campaigns : JSON.parse(JSON.stringify(seed.campaigns)),
+      approvals: Array.isArray(source.approvals) ? source.approvals : JSON.parse(JSON.stringify(seed.approvals)),
+      audit: Array.isArray(source.audit) ? source.audit : JSON.parse(JSON.stringify(seed.audit)),
+      savedOpportunityIds: Array.isArray(source.savedOpportunityIds) ? source.savedOpportunityIds : [...seed.savedOpportunityIds]
+    };
+  }
+
   function readState() {
     try {
-      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-      if (!stored || typeof stored !== "object") return structuredClone(seed);
-      return {
-        ...structuredClone(seed),
-        ...stored,
-        artist: { ...seed.artist, ...(stored.artist || {}) },
-        campaigns: Array.isArray(stored.campaigns) ? stored.campaigns : structuredClone(seed.campaigns),
-        approvals: Array.isArray(stored.approvals) ? stored.approvals : structuredClone(seed.approvals),
-        audit: Array.isArray(stored.audit) ? stored.audit : structuredClone(seed.audit),
-        savedOpportunityIds: Array.isArray(stored.savedOpportunityIds) ? stored.savedOpportunityIds : [...seed.savedOpportunityIds]
-      };
+      return mergeState(JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"));
     } catch (_) {
-      return JSON.parse(JSON.stringify(seed));
+      return mergeState(seed);
     }
   }
 
@@ -100,15 +111,7 @@
         });
         if (!saveResponse.ok) throw new Error("Initial local save failed");
       } else if (result.state) {
-        state = {
-          ...JSON.parse(JSON.stringify(seed)),
-          ...result.state,
-          artist: { ...seed.artist, ...(result.state.artist || {}) },
-          campaigns: Array.isArray(result.state.campaigns) ? result.state.campaigns : JSON.parse(JSON.stringify(seed.campaigns)),
-          approvals: Array.isArray(result.state.approvals) ? result.state.approvals : JSON.parse(JSON.stringify(seed.approvals)),
-          audit: Array.isArray(result.state.audit) ? result.state.audit : JSON.parse(JSON.stringify(seed.audit)),
-          savedOpportunityIds: Array.isArray(result.state.savedOpportunityIds) ? result.state.savedOpportunityIds : [...seed.savedOpportunityIds]
-        };
+        state = mergeState(result.state);
       } else {
         const saveResponse = await fetch("/api/state", {
           method: "PUT",
@@ -234,15 +237,53 @@
 
   function renderArtist() {
     const name = escapeHTML(state.artist.name);
-    $("#passport-artist-line").innerHTML = `${name} <span>·</span> ${escapeHTML(state.artist.genre)} <span>·</span> 2026`;
+    const release = state.release;
+    const parsedDate = release.releaseDate ? new Date(`${release.releaseDate}T12:00:00Z`) : null;
+    const hasDate = parsedDate && !Number.isNaN(parsedDate.getTime());
+    const longDate = hasDate ? new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(parsedDate) : "Date to be confirmed";
+    $("#workspace-date").textContent = new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(new Date()).toUpperCase();
+    $("#overview-song-title").textContent = release.title;
+    $("#opportunity-release-label").textContent = release.title;
+    $("#overview-artist-name").textContent = state.artist.name;
+    $("#overview-release-kind").textContent = release.kind.toUpperCase();
+    $("#overview-kind-copy").textContent = release.kind.toLowerCase();
+    $("#overview-release-date").textContent = longDate;
+    $("#release-countdown-days").textContent = hasDate ? String(Math.max(0, Math.ceil((parsedDate.getTime() - Date.now()) / 86400000))) : "—";
+    $("#release-countdown-unit").textContent = hasDate ? "d" : "";
     $("#detail-artist").textContent = state.artist.name;
     $("#detail-genre").textContent = state.artist.genre;
+    $("#detail-kind").textContent = release.kind;
+    $("#detail-duration").textContent = release.duration || "Not added";
+    $("#detail-isrc").textContent = release.isrc || "Not added";
+    $("#detail-explicit").textContent = release.explicit ? "Yes" : "No";
+    $("#detail-contributors").textContent = release.contributors || "Not added";
     $("#settings-artist-name").textContent = state.artist.name;
     $("#settings-artist-genre").textContent = `Independent artist · ${state.artist.genre}`;
-    const song = escapeHTML(state.artist.song);
-    $("#passport-song-title").textContent = state.artist.song;
-    $(".release-info h2").textContent = state.artist.song;
-    $(".cover-title").innerHTML = song.replace(/\s+/g, "<br>").toUpperCase();
+    $("#passport-song-title").textContent = release.title;
+    $("#passport-glance-title").textContent = `${release.title}, at a glance`;
+    $("#passport-kind-label").textContent = release.kind.toUpperCase();
+    $(".cover-title").innerHTML = escapeHTML(release.title.toUpperCase()).replace(/\s+/g, "<br>");
+    $("#passport-artist-line").innerHTML = `${name} <span>·</span> ${escapeHTML(state.artist.genre)} <span>·</span> ${hasDate ? parsedDate.getUTCFullYear() : "Release date not set"}`;
+    $("#passport-description").textContent = release.description || "No artist description added yet.";
+    $("#passport-genre-tag").textContent = state.artist.genre;
+    $("#passport-language-tag").textContent = release.language || "Language not set";
+    $("#passport-explicit-tag").textContent = release.explicit ? "Explicit" : "Clean lyrics";
+    $("#master-file-name").textContent = `${release.title.replace(/[^a-z0-9_-]+/gi, "_")}_master.wav`;
+    if (hasDate) {
+      const month = new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "UTC" }).format(parsedDate).toUpperCase();
+      const day = new Intl.DateTimeFormat("en-US", { day: "2-digit", timeZone: "UTC" }).format(parsedDate);
+      const weekdayYear = new Intl.DateTimeFormat("en-US", { weekday: "long", year: "numeric", timeZone: "UTC" }).format(parsedDate);
+      $("#passport-date").innerHTML = `<span>${month}</span> <b>${day}</b>`;
+      $("#passport-weekday").textContent = weekdayYear;
+    } else {
+      $("#passport-date").textContent = "Not set";
+      $("#passport-weekday").textContent = "Add a planned release date";
+    }
+    const confirmedBadge = $("#rights-confirmation-badge");
+    confirmedBadge.innerHTML = release.rightsConfirmed ? `<span class="icon icon-check"></span> Artist confirmed` : `<span class="icon icon-info"></span> Confirmation needed`;
+    $("#rights-summary").textContent = release.rightsConfirmed
+      ? "Artist self-reports authority to promote this recording"
+      : "Promotion authority has not been confirmed";
   }
 
   function renderReadiness() {
@@ -252,7 +293,8 @@
     $("#readiness-bar").style.width = `${readiness}%`;
     const cleanRow = $(".missing-asset");
     if (state.cleanVersion) {
-      cleanRow.innerHTML = `<span class="asset-file-icon"><span class="icon icon-check"></span></span><span class="asset-copy"><strong>Glasshouse_clean.wav</strong><small>WAV audio <span>·</span> Added to demo</small></span><span class="asset-ready"><span class="status-dot status-green"></span> Ready</span>`;
+      const safeTitle = escapeHTML(state.release.title.replace(/[^a-z0-9_-]+/gi, "_"));
+      cleanRow.innerHTML = `<span class="asset-file-icon"><span class="icon icon-check"></span></span><span class="asset-copy"><strong>${safeTitle}_clean.wav</strong><small>WAV audio <span>·</span> Added to demo</small></span><span class="asset-ready"><span class="status-dot status-green"></span> Ready</span>`;
     }
     if (state.cleanVersion) {
       $(".section-optional").textContent = "Complete";
@@ -270,11 +312,12 @@
   }
 
   function campaignForm() {
-    return `${modalTitle("Start a campaign", "Make a focused plan for a release. You can add details and ask your team to review it later.")}<form class="modal-form" id="campaign-form"><div class="field"><label for="campaign-name">Campaign name</label><input id="campaign-name" name="title" required maxlength="80" placeholder="e.g. Glasshouse release plan" /></div><div class="field"><label for="campaign-release">Release</label><select id="campaign-release" name="release"><option>${escapeHTML(state.artist.song)}</option><option>Soft Focus EP</option><option>Other release</option></select></div><div class="field"><label for="campaign-goal">What would you like to focus on?</label><select id="campaign-goal" name="goal"><option>Build thoughtful discovery around this release</option><option>Reconnect with existing listeners</option><option>Prepare a live release moment</option><option>Explore editorial opportunities</option></select></div><div class="modal-warning"><span class="icon icon-shield" aria-hidden="true"></span><span>This creates a draft in your demo workspace. It won’t contact anyone or set a budget.</span></div><div class="modal-footer"><button class="button button-secondary" type="button" data-action="close-modal">Cancel</button><button class="button button-primary" type="submit">Create draft <span aria-hidden="true">→</span></button></div></form>`;
+    return `${modalTitle("Start a campaign", "Make a focused plan for a release. You can add details and ask your team to review it later.")}<form class="modal-form" id="campaign-form"><div class="field"><label for="campaign-name">Campaign name</label><input id="campaign-name" name="title" required maxlength="80" placeholder="e.g. ${escapeHTML(state.release.title)} release plan" /></div><div class="field"><label for="campaign-release">Release</label><select id="campaign-release" name="release"><option>${escapeHTML(state.release.title)}</option><option>Soft Focus EP</option><option>Other release</option></select></div><div class="field"><label for="campaign-goal">What would you like to focus on?</label><select id="campaign-goal" name="goal"><option>Build thoughtful discovery around this release</option><option>Reconnect with existing listeners</option><option>Prepare a live release moment</option><option>Explore editorial opportunities</option></select></div><div class="modal-warning"><span class="icon icon-shield" aria-hidden="true"></span><span>This creates a draft in your demo workspace. It won’t contact anyone or set a budget.</span></div><div class="modal-footer"><button class="button button-secondary" type="button" data-action="close-modal">Cancel</button><button class="button button-primary" type="submit">Create draft <span aria-hidden="true">→</span></button></div></form>`;
   }
 
   function passportForm() {
-    return `${modalTitle("Edit release details", "Keep your core release information accurate. Changes stay in this demo workspace.")}<form class="modal-form" id="passport-form"><div class="field"><label for="artist-name">Artist name</label><input id="artist-name" name="artist" required maxlength="70" value="${escapeHTML(state.artist.name)}" /></div><div class="field"><label for="song-name">Track or release title</label><input id="song-name" name="song" required maxlength="70" value="${escapeHTML(state.artist.song)}" /></div><div class="field"><label for="genre-name">Primary genre</label><input id="genre-name" name="genre" required maxlength="50" value="${escapeHTML(state.artist.genre)}" /></div><div class="modal-footer"><button class="button button-secondary" type="button" data-action="close-modal">Cancel</button><button class="button button-primary" type="submit">Save changes</button></div></form>`;
+    const release = state.release;
+    return `${modalTitle("Edit Song Passport", "Record release facts and your rights confirmation. Identifiers and ownership details are not independently verified.")}<form class="modal-form" id="passport-form"><div class="field"><label for="artist-name">Primary artist</label><input id="artist-name" name="artist" required maxlength="70" value="${escapeHTML(state.artist.name)}" /></div><div class="field"><label for="song-name">Release or track title</label><input id="song-name" name="song" required maxlength="70" value="${escapeHTML(release.title)}" /></div><div class="field"><label for="genre-name">Primary genre</label><input id="genre-name" name="genre" required maxlength="50" value="${escapeHTML(state.artist.genre)}" /></div><div class="field"><label for="release-kind">Release type</label><select id="release-kind" name="kind">${["Single", "EP", "Album", "Compilation", "Other"].map((kind) => `<option ${release.kind === kind ? "selected" : ""}>${kind}</option>`).join("")}</select></div><div class="field"><label for="release-date">Planned release date</label><input id="release-date" name="releaseDate" type="date" value="${escapeHTML(release.releaseDate)}" /></div><div class="field"><label for="track-duration">Track duration</label><input id="track-duration" name="duration" inputmode="numeric" pattern="(?:[0-5]?[0-9]):[0-5][0-9]" maxlength="5" placeholder="3:42" value="${escapeHTML(release.duration)}" /><span class="field-hint">Minutes and seconds, such as 3:42. Leave blank if not known.</span></div><div class="field"><label for="release-language">Primary language</label><input id="release-language" name="language" maxlength="60" value="${escapeHTML(release.language)}" /></div><div class="field"><label for="release-territories">Promotion territories</label><input id="release-territories" name="territories" maxlength="150" value="${escapeHTML(release.territories.join(", "))}" /><span class="field-hint">ISO country codes separated by commas, for example GB, IE.</span></div><div class="field"><label for="release-isrc">ISRC, if assigned</label><input id="release-isrc" name="isrc" maxlength="12" pattern="[A-Za-z]{2}[A-Za-z0-9]{3}[0-9]{7}" value="${escapeHTML(release.isrc)}" placeholder="12-character ISRC" /><span class="field-hint">An ISRC identifies a recording; it does not prove ownership.</span></div><div class="field"><label for="track-description">Artist-provided track description</label><textarea id="track-description" name="description" maxlength="500" placeholder="A short, accurate description of the release">${escapeHTML(release.description)}</textarea><span class="field-hint">Use facts and wording you’re comfortable sharing.</span></div><div class="field"><label for="track-contributors">Contributors and roles</label><textarea id="track-contributors" name="contributors" maxlength="1000" placeholder="Name — role; name — role">${escapeHTML(release.contributors)}</textarea><span class="field-hint">Names and roles are informational. Add a separate rights agreement where needed.</span></div><div class="field checkbox-field"><input id="release-explicit" name="explicit" type="checkbox" ${release.explicit ? "checked" : ""} /><label for="release-explicit">This release contains explicit content.</label></div><div class="field checkbox-field"><input id="rights-confirmed" name="rightsConfirmed" type="checkbox" ${release.rightsConfirmed ? "checked" : ""} /><label for="rights-confirmed">I confirm I have authority to promote this recording.</label></div><div class="modal-warning"><span class="icon icon-shield" aria-hidden="true"></span><span>This is your self-reported confirmation, not legal clearance. Save changes only updates this local demo.</span></div><div class="modal-footer"><button class="button button-secondary" type="button" data-action="close-modal">Cancel</button><button class="button button-primary" type="submit">Save Song Passport</button></div></form>`;
   }
 
   function openOpportunityDetails(id) {
@@ -282,7 +325,7 @@
     if (!item) return;
     const alreadyRequested = state.approvals.some((approval) => approval.opportunityId === item.id && approval.status === "Pending");
     const reasons = item.why.map((reason) => `<li><span class="icon icon-check" aria-hidden="true"></span>${escapeHTML(reason)}</li>`).join("");
-    openModal(`${modalTitle(item.name, `${item.type} · ${item.fit}% fit for ${state.artist.song}`)}<div class="detail-source"><strong>Why NOTE surfaced this sample</strong><p>Fit is an explanation of how an example opportunity relates to the release details in this demo. It is not an endorsement or guarantee.</p></div><ul class="modal-list">${reasons}</ul><div class="detail-source"><strong>Source &amp; terms</strong><p>${escapeHTML(item.source)}. Always verify the organization, terms, permissions, and any costs before taking action.</p></div><div class="modal-warning"><span class="icon icon-shield" aria-hidden="true"></span><span>Requesting a review only adds a sample approval item. NOTE won’t send a pitch or share release materials.</span></div><div class="modal-footer"><button class="button button-secondary" type="button" data-action="close-modal">Close</button><button class="button button-primary" type="button" data-action="request-review" data-id="${escapeHTML(item.id)}" ${alreadyRequested ? "disabled" : ""}>${alreadyRequested ? "Review requested" : "Ask team to review"}</button></div>`, "icon-compass");
+    openModal(`${modalTitle(item.name, `${item.type} · ${item.fit}% fit for ${state.release.title}`)}<div class="detail-source"><strong>Why NOTE surfaced this sample</strong><p>Fit is an explanation of how an example opportunity relates to the release details in this demo. It is not an endorsement or guarantee.</p></div><ul class="modal-list">${reasons}</ul><div class="detail-source"><strong>Source &amp; terms</strong><p>${escapeHTML(item.source)}. Always verify the organization, terms, permissions, and any costs before taking action.</p></div><div class="modal-warning"><span class="icon icon-shield" aria-hidden="true"></span><span>Requesting a review only adds a sample approval item. NOTE won’t send a pitch or share release materials.</span></div><div class="modal-footer"><button class="button button-secondary" type="button" data-action="close-modal">Close</button><button class="button button-primary" type="button" data-action="request-review" data-id="${escapeHTML(item.id)}" ${alreadyRequested ? "disabled" : ""}>${alreadyRequested ? "Review requested" : "Ask team to review"}</button></div>`, "icon-compass");
   }
 
   function openApprovalDetails(id) {
@@ -311,9 +354,52 @@
     if (form.id === "passport-form") {
       event.preventDefault();
       const data = new FormData(form);
+      const previousTitle = state.release.title;
+      const releaseDate = String(data.get("releaseDate") || "");
+      const duration = String(data.get("duration") || "").trim();
+      const isrc = String(data.get("isrc") || "").trim().toUpperCase();
+      const territories = String(data.get("territories") || "")
+        .split(",").map((code) => code.trim().toUpperCase()).filter(Boolean);
+      if (duration && !/^(?:[0-5]?\d):[0-5]\d$/.test(duration)) {
+        notify("Enter duration as minutes:seconds, such as 3:42.", true);
+        return;
+      }
+      if (isrc && !/^[A-Z]{2}[A-Z0-9]{3}\d{7}$/.test(isrc)) {
+        notify("An ISRC must contain 12 characters in the standard format.", true);
+        return;
+      }
+      if (territories.some((code) => !/^[A-Z]{2}$/.test(code)) || new Set(territories).size !== territories.length) {
+        notify("Use unique two-letter territory codes, separated by commas.", true);
+        return;
+      }
       state.artist.name = String(data.get("artist") || "Mara Bloom").trim();
-      state.artist.song = String(data.get("song") || "Glasshouse").trim();
       state.artist.genre = String(data.get("genre") || "Indie pop").trim();
+      state.release = {
+        ...state.release,
+        title: String(data.get("song") || "Glasshouse").trim(),
+        kind: String(data.get("kind") || "Single"),
+        releaseDate,
+        duration,
+        language: String(data.get("language") || "").trim(),
+        territories,
+        isrc,
+        description: String(data.get("description") || "").trim(),
+        contributors: String(data.get("contributors") || "").trim(),
+        explicit: data.has("explicit"),
+        rightsConfirmed: data.has("rightsConfirmed")
+      };
+      const formattedDate = releaseDate
+        ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(new Date(`${releaseDate}T12:00:00Z`))
+        : "Date to be confirmed";
+      state.campaigns.forEach((campaign) => {
+        if (campaign.release === previousTitle) {
+          campaign.release = state.release.title;
+          campaign.releaseDate = formattedDate;
+          if (campaign.title.startsWith(`${previousTitle} —`)) {
+            campaign.title = `${state.release.title}${campaign.title.slice(previousTitle.length)}`;
+          }
+        }
+      });
       addAudit("Song Passport release details updated");
       save(); render(); closeModal(); notify("Song Passport updated in this demo.");
     }
