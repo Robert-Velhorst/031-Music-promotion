@@ -1,4 +1,5 @@
 import json
+import copy
 import tempfile
 import threading
 import unittest
@@ -6,11 +7,26 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from server import APP_DIR, MAX_STATE_BYTES, create_server
+from server import APP_DIR, MAX_STATE_BYTES, create_server, validate_state
 
 
 SAMPLE_STATE = {
     "artist": {"name": "Demo Artist", "genre": "Indie pop", "song": "Demo Track"},
+    "release": {
+        "id": "demo-release",
+        "title": "Demo Track",
+        "version": "",
+        "kind": "Single",
+        "releaseDate": "2026-10-23",
+        "duration": "3:42",
+        "explicit": False,
+        "language": "English",
+        "territories": ["GB"],
+        "isrc": "",
+        "description": "A sample artist-provided track description.",
+        "contributors": "Demo Artist — songwriter; Other Artist — producer",
+        "rightsConfirmed": True,
+    },
     "cleanVersion": False,
     "savedOpportunityIds": ["source-1"],
     "campaigns": [
@@ -85,6 +101,11 @@ class StateApiTests(unittest.TestCase):
             script = response.read().decode("utf-8")
         self.assertIn("loadServerState();", script)
 
+        with urlopen(f"{self.base_url}/styles.css", timeout=3) as response:
+            self.assertEqual(response.status, 200)
+            styles = response.read().decode("utf-8")
+        self.assertIn("--sidebar-width", styles)
+
     def test_state_is_empty_until_first_save(self):
         status, _, body = self.request("GET", "/api/state")
         self.assertEqual(status, 200)
@@ -120,6 +141,18 @@ class StateApiTests(unittest.TestCase):
 
         _, _, loaded = self.request("GET", "/api/state")
         self.assertEqual(loaded["state"], SAMPLE_STATE)
+
+    def test_release_details_reject_invalid_type_and_date(self):
+        invalid_type = copy.deepcopy(SAMPLE_STATE)
+        invalid_type["release"]["kind"] = "Playlist"
+        invalid_date = copy.deepcopy(SAMPLE_STATE)
+        invalid_date["release"]["releaseDate"] = "next Friday"
+        oversized_description = copy.deepcopy(SAMPLE_STATE)
+        oversized_description["release"]["description"] = "x" * 501
+
+        self.assertFalse(validate_state(invalid_type))
+        self.assertFalse(validate_state(invalid_date))
+        self.assertFalse(validate_state(oversized_description))
 
     def test_oversized_request_is_rejected_before_reading_body(self):
         request = Request(
