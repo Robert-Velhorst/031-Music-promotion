@@ -52,13 +52,77 @@
   let activeCampaignFilter = "all";
   let activeOpportunityFilter = "All";
   let lastFocused = null;
+  let serverPersistence = false;
+  let persistenceTimer = null;
+  let persistenceWarningShown = false;
+  let stateRevision = 0;
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const escapeHTML = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
 
   function save() {
+    stateRevision += 1;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
     catch (_) { /* The demo still works for this session if browser storage is unavailable. */ }
+    if (serverPersistence) {
+      window.clearTimeout(persistenceTimer);
+      persistenceTimer = window.setTimeout(() => {
+        fetch("/api/state", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(state)
+        }).then((response) => {
+          if (!response.ok) throw new Error("Local save failed");
+        }).catch(() => {
+          serverPersistence = false;
+          if (!persistenceWarningShown) {
+            persistenceWarningShown = true;
+            notify("The local save service disconnected. Changes remain in browser storage.", true);
+          }
+        });
+      }, 120);
+    }
+  }
+
+  async function loadServerState() {
+    if (!(location.protocol === "http:" || location.protocol === "https:")) return;
+    const revisionAtRequest = stateRevision;
+    try {
+      const response = await fetch("/api/state", { headers: { "Accept": "application/json" } });
+      if (!response.ok) return;
+      const result = await response.json();
+      serverPersistence = true;
+      if (stateRevision !== revisionAtRequest) {
+        const saveResponse = await fetch("/api/state", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(state)
+        });
+        if (!saveResponse.ok) throw new Error("Initial local save failed");
+      } else if (result.state) {
+        state = {
+          ...JSON.parse(JSON.stringify(seed)),
+          ...result.state,
+          artist: { ...seed.artist, ...(result.state.artist || {}) },
+          campaigns: Array.isArray(result.state.campaigns) ? result.state.campaigns : JSON.parse(JSON.stringify(seed.campaigns)),
+          approvals: Array.isArray(result.state.approvals) ? result.state.approvals : JSON.parse(JSON.stringify(seed.approvals)),
+          audit: Array.isArray(result.state.audit) ? result.state.audit : JSON.parse(JSON.stringify(seed.audit)),
+          savedOpportunityIds: Array.isArray(result.state.savedOpportunityIds) ? result.state.savedOpportunityIds : [...seed.savedOpportunityIds]
+        };
+      } else {
+        const saveResponse = await fetch("/api/state", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(state)
+        });
+        if (!saveResponse.ok) throw new Error("Initial local save failed");
+      }
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+      catch (_) { /* SQLite remains the source of persistence in server mode. */ }
+      render();
+    } catch (_) {
+      serverPersistence = false;
+    }
   }
 
   function addAudit(text) {
@@ -348,4 +412,5 @@
   });
 
   render();
+  loadServerState();
 })();
