@@ -10,7 +10,7 @@ This repository contains the implementation specification for NOTE's Promotion p
 
 ## Interactive demo
 
-A runnable front-end prototype is in [`demo/`](demo/README.md). It uses fictional opportunities and illustrative metrics; approval controls record local demo decisions and do not contact anyone, publish content, or spend money.
+A runnable local demo is in [`demo/`](demo/README.md). It includes a loopback-only SQLite persistence service and uses fictional opportunities and sample metrics; it does not contact recipients, publish content, or spend money.
 
 ## 1. Product vision
 
