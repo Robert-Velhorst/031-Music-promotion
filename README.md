@@ -8,6 +8,10 @@ The official product name is NOTE. This repository covers Promotion; it does not
 
 This repository contains the implementation specification for NOTE's Promotion product. The name is NOTE. The MVP scope and acceptance criteria are defined below.
 
+## Interactive demo
+
+A runnable local demo is in [`demo/`](demo/README.md). It includes a loopback-only SQLite persistence service and uses fictional opportunities and sample metrics; it does not contact recipients, publish content, or spend money.
+
 ## 1. Product vision
 
 NOTE's Promotion pillar should make professional music promotion accessible to creators who make and release music but do not have a label, promotion team, large network, or live-performance career.
