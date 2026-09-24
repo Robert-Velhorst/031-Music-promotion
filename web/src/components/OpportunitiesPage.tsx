@@ -1,0 +1,20 @@
+import { ArrowUpRight, AudioLines, Banknote, BookOpenCheck, FileText, Globe2, Headphones, Mail, Search, ShieldCheck, Sparkles } from 'lucide-react';
+import type { Lead } from '../types';
+import { EmptyState, LoadMore } from './SharedUi';
+import { PageHeader } from './SharedUi';
+
+export function OpportunitiesPage(props: {
+    leads: Lead[]; query: string; onAdd: () => void; onEdit: (item: Lead) => void; onSuppress: (item: Lead) => void;
+    busyAction: string; onLoadMore: () => void; hasMore: boolean;
+}) {
+    const items = props.leads.filter((item) => !props.query || `${item.name} ${item.channel} ${item.fitReason} ${item.territory}`.toLowerCase().includes(props.query));
+    return <>
+        <PageHeader kicker="FIND FIT, REVIEW THE TERMS" title="Opportunities" description="Keep a shortlist of real outlets and submission routes, with the evidence and fee details you checked." action={props.onAdd} actionText="Add opportunity" />
+        <div className="notice-card notice-caution"><div className="notice-icon"><Search size={18} /></div><div><strong>Discovery and vetting stay human.</strong><span>NOTE does not scrape, contact, or claim a relationship with any outlet. Verify public rules, current contact routes, fees, and audience claims yourself.</span></div><span className="status-pill status-neutral"><i />YOUR REVIEW</span></div>
+        <section className="panel data-panel"><div className="table-top"><div><div className="panel-kicker">YOUR SHORTLIST</div><h2>{items.length} opportunity{items.length === 1 ? '' : 'ies'}</h2></div><div className="shortlist-stat"><span>Suppressed</span><strong>{props.leads.filter((lead) => lead.suppressed).length}</strong></div></div>
+            {items.length ? <div className="opportunity-list">{items.map((lead) => <article className={`opportunity-row ${lead.suppressed ? 'opportunity-muted' : ''}`} key={lead.id}><span className="opportunity-icon">{lead.channel === 'Radio' ? <AudioLines size={17} /> : lead.channel === 'Press' ? <FileText size={17} /> : lead.channel === 'Podcast' ? <Headphones size={17} /> : lead.channel === 'Creator' ? <Sparkles size={17} /> : <Globe2 size={17} />}</span><div className="opportunity-main"><div className="opportunity-name"><strong>{lead.name}</strong><span className={`status-pill ${lead.suppressed ? 'status-muted' : lead.contactReviewed ? 'status-good' : 'status-pending'}`}><i />{lead.suppressed ? 'Do not contact' : lead.contactReviewed ? 'Reviewed' : 'Needs review'}</span></div><div className="opportunity-sub">{lead.channel}{lead.territory ? ` · ${lead.territory}` : ''} · {lead.fitReason}</div><div className="opportunity-facts">{lead.requirements && <span><BookOpenCheck size={12} />{lead.requirements}</span>}{lead.feeDisclosure && <span><Banknote size={12} />{lead.feeDisclosure}</span>}{lead.contactRoute && <span><Mail size={12} />{lead.contactRoute}</span>}</div></div><div className="opportunity-actions">{lead.publicUrl && <a href={lead.publicUrl} target="_blank" rel="noreferrer" className="icon-button" aria-label={`Open public page for ${lead.name}`}><ArrowUpRight size={16} /></a>}<button type="button" className="button button-small button-outline" onClick={() => props.onEdit(lead)}>Review</button>{!lead.suppressed && <button type="button" className="button button-small button-danger-soft" onClick={() => props.onSuppress(lead)} disabled={props.busyAction === `suppress-${lead.id}`}>Do not contact</button>}</div></article>)}</div> : <EmptyState icon={<Search size={20} />} title={props.query ? 'No opportunities match your search' : 'Your shortlist starts with a real fit'} detail="Save a public page, current submission route, fit reason, and any fee disclosure. Confirm the rules before taking action." action="Add opportunity" onClick={props.onAdd} />}
+            {props.hasMore && <LoadMore busy={props.busyAction === 'page-leads'} onClick={props.onLoadMore} />}
+        </section>
+        <div className="suppression-note"><ShieldCheck size={16} /><span>Do not contact is permanent in NOTE. A suppressed opportunity stays visible in your records but cannot be used for new activity logs.</span></div>
+    </>;
+}
