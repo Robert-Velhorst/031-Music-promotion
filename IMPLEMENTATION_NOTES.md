@@ -1,10 +1,14 @@
-# NOTE Promotion prototype — implementation notes
+# NOTE Promotion prototype - implementation notes
 
 ## Product interpretation
 
 NOTE is the broader music creator platform. This app implements the first slice of project 031: artist-facing Promotion planning. It keeps the catalog, rights and revenue records connected to campaigns without presenting all ten platform pillars as already built. It does not add recipient accounts, a curator portal, distribution, a social network, or music generation.
 
 The interface is a usable local prototype. Sample entities are synthetic, clearly marked, and replaceable. Local authorization records demonstrate the approval boundary only; they do not authorize an external action.
+
+## Public landing page
+
+The repository root is a responsive landing page for new visitors. It explains NOTE's Promotion purpose and trust boundaries, labels the interactive workspace as an early prototype, and links visitors to `workspace.html`. The illustration uses HTML and CSS; Google Fonts are optional and system fonts remain available as fallbacks.
 
 ## Screen inventory
 
@@ -41,7 +45,8 @@ The interface is a usable local prototype. Sample entities are synthetic, clearl
 
 - JavaScript syntax: checked with `node --check app.js`.
 - Campaign validation: `node --test campaign-validation.test.js` passed (4 tests covering valid input, required fields, track membership, allowed channels, real calendar dates, date order and commitment bounds).
-- Campaign creation uses the same pure validation module exercised by the Node test suite. External contact permission is forced off in saved campaign records.
+- Campaign creation now uses the same pure validation module exercised by the Node test suite. External contact permission is forced off in saved campaign records.
+- Landing page static checks cover the workspace call to action, product principles, prototype disclosure, mobile breakpoints, skip link, and reduced-motion support.
 - Local static server: started on port 4173; browser-hosted CUA initialization failed because its Windows platform directory was unavailable (`HRESULT 0x80070003`).
 - Browserbase could start, but it could not reach this machine's localhost address; its page showed a site-unreachable error. No rendered browser screenshot or click-through result is claimed.
 - Remaining verification: inspect the live page at desktop and mobile sizes, exercise create/edit/authorize/export flows in a local browser, and then run accessibility and security review before production use.
@@ -55,4 +60,5 @@ The interface is a usable local prototype. Sample entities are synthetic, clearl
 5. Implement an immutable or tamper-evident audit log and robust campaign pause/cancel behavior.
 6. Add verified reply, placement, usage and revenue imports with clear evidence and confidence labels.
 7. Complete WCAG 2.2 AA, privacy, threat-model, legal and operational review; document Hetzner deployment, backups and rollback.
+
 
