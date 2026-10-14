@@ -40,6 +40,8 @@ The interface is a usable local prototype. Sample entities are synthetic, clearl
 ## Verification record
 
 - JavaScript syntax: checked with `node --check app.js`.
+- Campaign validation: `node --test campaign-validation.test.js` passed (4 tests covering valid input, required fields, track membership, allowed channels, real calendar dates, date order and commitment bounds).
+- Campaign creation uses the same pure validation module exercised by the Node test suite. External contact permission is forced off in saved campaign records.
 - Local static server: started on port 4173; browser-hosted CUA initialization failed because its Windows platform directory was unavailable (`HRESULT 0x80070003`).
 - Browserbase could start, but it could not reach this machine's localhost address; its page showed a site-unreachable error. No rendered browser screenshot or click-through result is claimed.
 - Remaining verification: inspect the live page at desktop and mobile sizes, exercise create/edit/authorize/export flows in a local browser, and then run accessibility and security review before production use.
