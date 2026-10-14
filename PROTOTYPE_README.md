@@ -12,12 +12,19 @@ python -m http.server 4173
 
 Then open `http://localhost:4173`.
 
+To run the campaign input validation tests with Node.js 22 or newer:
+
+```powershell
+node --test campaign-validation.test.js
+```
+
 ## Implemented in this build
 
 - Artist workspace navigation and overview
 - Editable Song Passports with artist-entered metadata and rights assertions
 - Advisory release-readiness indicators
 - Campaign planning with dates, territories, channels, activity commitment and permission boundaries
+- Shared campaign input validation for track selection, supported channels, calendar dates and bounded commitments
 - Explicit local authorization record that does not trigger external work
 - Opportunity directory with evidence, fit reasons, risk signals, status filters and a review list
 - Factual pitch drafts assembled from saved artist and track facts; drafts stay editable and unsent
