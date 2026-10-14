@@ -1,4 +1,4 @@
-# NOTE — Music Promotion
+# NOTE - Music Promotion
 
 This workspace contains a first, browser-run implementation of NOTE's Promotion workflow. It is grounded in the `031-Music-promotion` repository specification and the NOTE product material in the connected Google Drive.
 
@@ -10,7 +10,7 @@ No build step or package install is required. From this directory, run:
 python -m http.server 4173
 ```
 
-Then open `http://localhost:4173`.
+Then open `http://localhost:4173` for the NOTE landing page. Select **Explore the preview** or open `http://localhost:4173/workspace.html` to use the interactive workspace.
 
 To run the campaign input validation tests with Node.js 22 or newer:
 
@@ -19,6 +19,8 @@ node --test campaign-validation.test.js
 ```
 
 ## Implemented in this build
+
+The repository root is a responsive product landing page for new visitors. It explains NOTE's artist-first Promotion purpose and principles, labels the interactive workspace as an early prototype, and links visitors to `workspace.html`. The illustration uses CSS and HTML rather than external imagery.
 
 - Artist workspace navigation and overview
 - Editable Song Passports with artist-entered metadata and rights assertions
@@ -40,6 +42,7 @@ The repository specification requires at least two real compliant adapters befor
 
 ## Source of product requirements
 
-- [031 — Music Promotion repository](https://github.com/Robert-Velhorst/031-Music-promotion)
+- [031 - Music Promotion repository](https://github.com/Robert-Velhorst/031-Music-promotion)
 
 The current product name is **NOTE**. Catalyst is an earlier working label. Promotion is the first implementation scope within NOTE's wider platform direction.
+
