@@ -3,15 +3,98 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#111923" />
-    <meta name="description" content="NOTE helps independent artists plan and manage legitimate music promotion." />
-    <title>NOTE — Music Promotion</title>
-    <link rel="stylesheet" href="styles.css" />
+    <meta name="theme-color" content="#f5f6ef" />
+    <meta name="description" content="NOTE helps independent artists plan thoughtful, legitimate music promotion with clear boundaries and an honest record of activity." />
+    <meta property="og:title" content="NOTE - Promotion that keeps the artist in control" />
+    <meta property="og:description" content="A clear workspace for release facts, thoughtful opportunities, campaign boundaries, and honest reporting." />
+    <title>NOTE - Promotion that keeps the artist in control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="landing.css" />
   </head>
   <body>
-    <div id="app"></div>
-    <dialog id="dialog" aria-labelledby="dialog-title"></dialog>
-    <div id="toast" role="status" aria-live="polite"></div>
-    <script type="module" src="app.js"></script>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="NOTE home"><span class="brand-mark">N</span><span class="brand-word">NOTE<span class="brand-dot">.</span></span></a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#how-it-works">How it works</a>
+        <a href="#principles">Our principles</a>
+        <a href="README.md">Product specification</a>
+      </nav>
+      <a class="button button-small button-dark" href="workspace.html">Explore the preview <span aria-hidden="true">?</span></a>
+    </header>
+
+    <main id="main">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-line"></span> MUSIC PROMOTION, WITH CLARITY</p>
+          <h1>Give your music<br />a <span>thoughtful way forward.</span></h1>
+          <p class="hero-lede">NOTE is an artist-first workspace for planning legitimate music promotion: keep your release facts together, focus on relevant opportunities, and see what actually happened.</p>
+          <div class="hero-actions">
+            <a class="button button-lime" href="workspace.html">Explore the interactive preview <span aria-hidden="true"></span></a>
+            <a class="quiet-link" href="#how-it-works">See how NOTE works <span aria-hidden="true"></span></a>
+          </div>
+          <div class="hero-proof"><span class="proof-icon" aria-hidden="true">�</span><span>No fake engagement. No promised streams. You remain in control.</span></div>
+        </div>
+
+        <div class="hero-art" aria-label="Illustration of NOTE's artist promotion workspace">
+          <div class="art-glow"></div><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+          <div class="note-card passport-card">
+            <div class="card-top"><span class="mini-label">SONG PASSPORT</span><span class="live-dot"><i></i> READY TO REVIEW</span></div>
+            <div class="track-row"><div class="cover"><span>02</span><i></i></div><div><strong>Afterglow Relay</strong><small>Northline Audio � Single</small></div><span class="more"></span></div>
+            <div class="waveform" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="card-meta"><span>Release facts</span><b>Organized</b><span>Rights assertion</span><b>Artist-entered</b></div>
+          </div>
+          <div class="note-card opportunity-card"><div class="opportunity-icon">?</div><div><span class="mini-label">OPPORTUNITY REVIEW</span><strong>Good fit is a reason to look closer.</strong><small>Evidence � route � requirements � risk</small></div><span class="review-tag">REVIEW</span></div>
+          <div class="floating-note"><span class="floating-check">�</span><span><strong>Your boundaries,</strong><br />clear from the start.</span></div>
+          <div class="art-caption"><span>PLAN</span><i></i><span>REVIEW</span><i></i><span>LEARN</span></div>
+        </div>
+      </section>
+
+      <section class="preview-bar" aria-label="Preview status">
+        <span class="preview-pill"><i></i> INTERACTIVE PREVIEW</span>
+        <p>Sample records only. No messages are sent and no external services are connected.</p>
+        <a href="workspace.html">Open the workspace <span aria-hidden="true">?</span></a>
+      </section>
+
+      <section class="intro section-wrap" id="how-it-works">
+        <div class="section-heading">
+          <p class="eyebrow"><span class="eyebrow-line"></span> A CALMER PROMOTION WORKFLOW</p>
+          <h2>From release details<br />to <em>considered action.</em></h2>
+          <p>Promotion can feel scattered across links, forms, deadlines, and messages. NOTE is designed to bring the work into one understandable flow.</p>
+        </div>
+        <div class="steps">
+          <article class="step"><span class="step-number">01</span><div class="step-icon icon-record" aria-hidden="true"><span></span><span></span><span></span></div><h3>Keep the facts together</h3><p>Build a reusable Song Passport for the track: release details, contributors, links, and your own rights assertions.</p></article>
+          <article class="step"><span class="step-number">02</span><div class="step-icon icon-focus" aria-hidden="true"><span></span></div><h3>Choose with context</h3><p>Review why an opportunity may fit, where its evidence comes from, what the route requires, and what still needs checking.</p></article>
+          <article class="step"><span class="step-number">03</span><div class="step-icon icon-history" aria-hidden="true"><span></span><span></span></div><h3>See what happened</h3><p>Keep activity, replies, placements, usage, and revenue distinct, with a record that makes the next decision easier.</p></article>
+        </div>
+      </section>
+
+      <section class="principles" id="principles">
+        <div class="principles-inner">
+          <div class="principles-copy"><p class="eyebrow eyebrow-light"><span class="eyebrow-line"></span> BUILT AROUND ARTIST CONTROL</p><h2>Good promotion<br />starts with <em>clear boundaries.</em></h2><p>NOTE is being designed to help independent artists find and manage relevant promotion without turning their music into a numbers game.</p><a class="button button-outline" href="README.md">Read the product principles <span aria-hidden="true">?</span></a></div>
+          <div class="principles-list">
+            <div class="principle"><span class="principle-mark">01</span><div><strong>Legitimate activity</strong><p>No bots, fake engagement, guaranteed stream schemes, or indiscriminate outreach.</p></div></div>
+            <div class="principle"><span class="principle-mark">02</span><div><strong>Artist-approved boundaries</strong><p>Spending, paid placements, licences, agreements, and rights decisions need separate approval.</p></div></div>
+            <div class="principle"><span class="principle-mark">03</span><div><strong>Honest outcomes</strong><p>Activity is not a reply. A reply is not a placement. A placement is not revenue.</p></div></div>
+            <div class="principle"><span class="principle-mark">04</span><div><strong>No artistic gatekeeping</strong><p>Promotion should not decide whether your music is worthy of being heard.</p></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="preview-detail section-wrap">
+        <div class="preview-detail-copy"><p class="eyebrow"><span class="eyebrow-line"></span> TRY THE CURRENT PREVIEW</p><h2>See the workflow<br />for yourself.</h2><p>The interactive preview includes Song Passports, campaign planning, sample opportunity review, factual pitch drafts, and a local activity log. It is an early prototype-not a live promotion service.</p><a class="button button-dark" href="workspace.html">Open the NOTE preview <span aria-hidden="true"></span></a></div>
+        <div class="preview-panel" aria-label="Decorative preview of the NOTE workspace">
+          <div class="preview-panel-head"><span>NOTE / WORKSPACE</span><span class="window-dots"><i></i><i></i><i></i></span></div>
+          <div class="preview-panel-body"><div class="preview-sidebar"><b>N</b><i></i><i></i><i></i><i></i></div><div class="preview-main"><div class="preview-greeting"><small>CAMPAIGN OVERVIEW</small><strong>Make every action count.</strong><span>Plan thoughtful promotion around your music.</span></div><div class="preview-stats"><div><small>CAMPAIGNS</small><b>02</b></div><div><small>TO REVIEW</small><b>03</b></div><div><small>LIVE ACTIONS</small><b>-</b></div></div><div class="preview-table"><div><b>Opportunity</b><b>Evidence</b><b>Status</b></div><div><span>Low Tide Radio</span><span>Recent programming</span><i>Review</i></div><div><span>Soft Focus Sessions</span><span>Similar releases</span><i>Check route</i></div></div><div class="preview-foot"><span><i></i> SAMPLE WORKSPACE</span><span>Nothing sent</span></div></div></div>
+        </div>
+      </section>
+
+      <section class="closing"><div class="closing-orb"></div><p class="eyebrow eyebrow-light"><span class="eyebrow-line"></span> MAKE ROOM FOR THE MUSIC</p><h2>Promotion with purpose.<br /><em>Progress you can see.</em></h2><p>Explore NOTE's early Promotion preview and see how a more thoughtful workflow could feel.</p><a class="button button-lime" href="workspace.html">Explore NOTE <span aria-hidden="true"></span></a><span class="closing-note">Early prototype � Local browser storage � No live integrations</span></section>
+    </main>
+
+    <footer class="site-footer"><a class="brand brand-footer" href="./"><span class="brand-mark">N</span><span class="brand-word">NOTE<span class="brand-dot">.</span></span></a><p>Artist-first music promotion, designed around clarity and control.</p><div class="footer-links"><a href="README.md">Product specification</a><a href="https://github.com/Robert-Velhorst/031-Music-promotion">GitHub repository</a></div><span class="copyright">c 2026 NOTE Promotion � Prototype</span></footer>
   </body>
 </html>
+
