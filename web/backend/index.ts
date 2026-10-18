@@ -2,6 +2,7 @@ import {
     db,
     error,
     json,
+    isAppDatabaseError,
     requireAuth,
     router,
     type RouterContext,
@@ -66,7 +67,7 @@ function asKind(value: string): RecordKind | null {
 function failure(operation: string, cause: unknown) {
     const name = cause instanceof Error ? cause.name : 'unknown';
     console.error('NOTE request failed', { operation, name });
-    if (name === 'AppDatabaseQuotaExceeded') return error('rate_limited_try_later', 429);
+    if (isAppDatabaseError(cause) && cause.code === 'AppDatabaseQuotaExceeded') return error('rate_limited_try_later', 429);
     return error('service_unavailable', 503);
 }
 

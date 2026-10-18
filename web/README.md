@@ -46,3 +46,7 @@ For a hosted deploy, submit the new files under `web/` as the project root using
 ## Before a public launch
 
 This source is a hosted pilot foundation, not the complete NOTE business operation. Add and validate actual promotion adapters, compliant opportunity discovery, immutable audit and qualification accounting, statement-specific reconciliation controls, user-facing legal terms and privacy materials, support/incident processes, and the required provider credentials and policy reviews. No external provider adapter or money movement is represented as live here.
+
+## Source review verification (2026-10-19)
+
+Strict TypeScript checks passed for the frontend and backend against the official AppDeploy auth, HTTP and database declarations retrieved for this review. A Vite source bundle also passed with the platform-injected client SDK kept external, using an existing compatible React toolchain. This validates the source contract and bundling, not the hosted SDK implementation, authentication, database persistence, or the declarative end-to-end suite. Those hosted acceptance checks remain required before a deployment is accepted. SDK database quota failures are identified by the documented error code and surfaced as HTTP 429.
