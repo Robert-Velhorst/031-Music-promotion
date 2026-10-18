@@ -1,0 +1,136 @@
+[
+  {
+    "name": "Sign in, set up an artist workspace, and keep a release private",
+    "sanity": true,
+    "viewport": "desktop",
+    "covers": [
+      "successful authentication",
+      "anonymous sign-in boundary",
+      "private per-user workspace isolation",
+      "GET /api/workspace",
+      "POST /api/profile",
+      "POST /api/records/releases",
+      "durable profile and Song Passport reads"
+    ],
+    "description": "Verifies an authenticated artist can save private career details and a release, reload the workspace, and see only their own records.",
+    "steps": [
+      "Open NOTE while signed out and confirm the workspace requires sign-in",
+      "Sign in as Actor A",
+      "Create an artist profile with a name, genre, home territory NL, language English, and territory NL",
+      "Create a Single release with title 'Quiet Harbour', language English, territory NL, and authority confirmation unchecked",
+      "Refresh the page and verify the artist profile and 'Quiet Harbour' are still present",
+      "Sign out as Actor A and sign in as Actor B with a separate test account",
+      "Verify Actor B has no profile or 'Quiet Harbour' release from Actor A"
+    ],
+    "expected": "Actor A's records remain after refresh and are absent from Actor B's private workspace."
+  },
+  {
+    "name": "Set campaign boundaries before marking a campaign active",
+    "viewport": "desktop",
+    "covers": [
+      "POST /api/records/campaigns",
+      "PUT /api/records/campaigns/:id",
+      "POST /api/campaigns/:id/transition",
+      "campaign state transition guard",
+      "artist authority confirmation boundary",
+      "campaign pause, resume, and completion",
+      "POST /api/releases/:id/archive"
+    ],
+    "description": "Verifies campaign boundaries and release authority are reviewed before activation, and all state changes remain artist controlled.",
+    "setup": [
+      "Sign in and create an artist profile with territory NL and language English",
+      "Create a Single release named 'Quiet Harbour' in territory NL with language English and leave authority confirmation unchecked"
+    ],
+    "steps": [
+      "Create a campaign for 'Quiet Harbour' with a specific objective, future start and end dates, Press and Radio channels, NL territory, English language, a EUR budget cap, and explicit exclusions",
+      "Add campaign copy containing only known release details, review its facts and rights, and save it",
+      "Mark the campaign Ready",
+      "Choose Mark active and verify NOTE blocks activation until release authority is confirmed",
+      "Edit the release and confirm authority to promote it",
+      "Mark the campaign Active",
+      "Open Song Passport, edit the release, uncheck authority confirmation, and verify NOTE blocks the save while its campaign is active",
+      "Cancel and reopen the release to verify authority remains confirmed, then Pause the campaign, resume it, and mark it Completed",
+      "Refresh and verify the campaign remains Completed",
+      "Archive the release and verify it remains in history while being unavailable for a new campaign"
+    ],
+    "expected": "The campaign cannot be marked Active before authority and boundaries are confirmed; reviewed copy and campaign history persist. NOTE sends no external actions."
+  },
+  {
+    "name": "Vet an opportunity, record artist-run activity, and suppress contact",
+    "viewport": "desktop",
+    "covers": [
+      "POST /api/records/leads",
+      "PUT /api/records/leads/:id",
+      "POST /api/leads/:id/suppress",
+      "POST /api/records/actions",
+      "PUT /api/records/actions/:id",
+      "DELETE /api/records/actions/:id",
+      "suppressed-opportunity activity guard",
+      "activity and outcome separation"
+    ],
+    "description": "Verifies an artist can keep a source and fee note, log only work they performed, and make a permanent do-not-contact decision.",
+    "setup": [
+      "Sign in and create an artist profile with territory NL and language English",
+      "Create a Single release named 'Quiet Harbour' in NL with authority confirmed",
+      "Create a campaign for that release with dates, a Press channel, NL territory, English language, a EUR budget cap, and exclusions"
+    ],
+    "steps": [
+      "Add an opportunity called 'North Sea Sessions' with a real HTTPS public page, Press channel, NL territory, a fit reason, public submission route, fee disclosure 'Free', and mark current rules reviewed",
+      "Create an activity record for the campaign and opportunity with event 'Sent by artist', today's date, and a short factual note",
+      "Edit the activity note and verify the changed note is visible",
+      "Use Do not contact for 'North Sea Sessions' and enter a reason",
+      "Refresh and verify the opportunity is marked Do not contact and no longer appears as an option for new activity",
+      "Delete the activity record and verify it is absent after refresh"
+    ],
+    "expected": "The opportunity stays recorded as suppressed, the activity log accurately reflects only saved manual entries, and removed activity remains absent after refresh."
+  },
+  {
+    "name": "Import a royalty statement, reconcile by release, and export records",
+    "viewport": "desktop",
+    "covers": [
+      "POST /api/records/royalties",
+      "PUT /api/records/royalties/:id",
+      "POST /api/royalties/import",
+      "statement provenance and duplicate handling",
+      "release-linked revenue ledger",
+      "GET /api/data/export",
+      "GET /api/records/:kind pagination"
+    ],
+    "description": "Verifies source data can be entered or imported, tied to a release, and exported with provenance while larger collections remain paginated.",
+    "setup": [
+      "Sign in and create an artist profile with territory NL and language English",
+      "Create a Single release named 'Quiet Harbour' with ISRC 'NLABC2600001', language English, and territory NL"
+    ],
+    "steps": [
+      "Choose a CSV statement with headers ISRC, Amount, Currency, Statement date, Period, Category, Source and 100 distinct statement lines for 'NLABC2600001'; map the columns, use reference 'CSV-Q1-2026', and import",
+      "Verify the ledger shows the statement source and imported artist statement provenance",
+      "Import the exact same 100-line CSV again and verify the matching rows are skipped rather than added twice",
+      "Add an artist-entered income record for 'Quiet Harbour' with source 'Example Distributor', category 'Master royalties', period '2026 Q1', date '2026-04-15', amount 2.50, currency EUR, and statement reference 'Q1-2026'",
+      "Edit the manual record to amount 2.75 and verify the revised amount is shown",
+      "Load more income records and verify the additional page appears",
+      "Open Settings and download the complete workspace JSON export"
+    ],
+    "expected": "The imported statement lines retain source and provenance, the exact repeat is skipped, the manual entry is editable, the next page loads, and a complete JSON export downloads."
+  },
+  {
+    "name": "Export and permanently delete NOTE data from a phone-sized screen",
+    "viewport": "mobile",
+    "covers": [
+      "responsive navigation and forms",
+      "DELETE /api/account/data/:kind",
+      "explicit destructive-action confirmation",
+      "bounded paginated deletion",
+      "auth account remains after NOTE data deletion",
+      "workspace is empty after reload"
+    ],
+    "description": "Verifies the mobile workspace can be exported and all NOTE records can be permanently removed through explicit confirmation without deleting the sign-in account.",
+    "steps": [
+      "Sign in to a test workspace with an artist profile, one release, one campaign, one opportunity, one activity record, and one income line",
+      "Open the mobile navigation and use Settings to download the workspace export",
+      "Choose Delete all NOTE data and enter the exact confirmation 'DELETE MY NOTE DATA'",
+      "Verify NOTE reports completion and the workspace contains no profile, releases, campaigns, opportunities, activity, or income records",
+      "Refresh and verify the workspace remains empty while the account stays signed in"
+    ],
+    "expected": "All NOTE records are gone after refresh, the sign-in account remains active, and the mobile layout completes the export and deletion flows."
+  }
+]
