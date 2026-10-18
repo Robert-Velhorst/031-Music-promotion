@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f7f5" />
+    <meta name="description" content="NOTE helps independent artists plan thoughtful music releases." />
+    <title>NOTE — Artist workspace</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+        <div class="brand-row">
+          <a class="brand" href="#overview" aria-label="NOTE home"><span class="brand-mark">n</span><span>note</span></a>
+          <button class="icon-button mobile-close" id="close-menu" aria-label="Close menu"><span class="icon icon-close"></span></button>
+        </div>
+
+        <button class="workspace-switcher" type="button" aria-label="Current workspace: Mara Bloom">
+          <span class="workspace-avatar">mb</span>
+          <span class="workspace-copy"><strong>Mara Bloom</strong><small>Artist workspace</small></span>
+          <span class="icon icon-chevron"></span>
+        </button>
+
+        <div class="nav-label">Workspace</div>
+        <nav class="primary-nav">
+          <button class="nav-item active" data-view="overview"><span class="icon icon-home"></span><span>Overview</span></button>
+          <button class="nav-item" data-view="campaigns"><span class="icon icon-spark"></span><span>Campaigns</span><span class="nav-count" id="campaign-count">2</span></button>
+          <button class="nav-item" data-view="passport"><span class="icon icon-music"></span><span>Song Passport</span></button>
+          <button class="nav-item" data-view="opportunities"><span class="icon icon-compass"></span><span>Opportunities</span><span class="nav-dot"></span></button>
+          <button class="nav-item" data-view="approvals"><span class="icon icon-check"></span><span>Approvals</span><span class="nav-count pending-count" id="approval-count">3</span></button>
+          <button class="nav-item" data-view="reports"><span class="icon icon-chart"></span><span>Reports</span></button>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-note"><span class="icon icon-shield"></span><span>Artist approval always comes first.</span></div>
+        <button class="nav-item settings-item" data-view="settings"><span class="icon icon-settings"></span><span>Settings</span></button>
+        <button class="account-row" type="button" id="account-menu">
+          <span class="account-avatar">MB</span>
+          <span class="account-copy"><strong>Mara Bloom</strong><small>Artist account</small></span>
+          <span class="icon icon-more"></span>
+        </button>
+      </aside>
+
+      <div class="sidebar-scrim" id="sidebar-scrim"></div>
+      <div class="main-column">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="icon-button menu-button" id="open-menu" aria-label="Open menu"><span class="icon icon-menu"></span></button>
+            <div class="breadcrumb"><span>Workspace</span><span class="breadcrumb-slash">/</span><strong id="breadcrumb-page">Overview</strong></div>
+          </div>
+          <div class="topbar-right">
+            <span class="demo-pill"><span class="demo-dot"></span> Demo workspace</span>
+            <button class="icon-button notification-button" id="notification-button" aria-label="Notifications"><span class="icon icon-bell"></span><span class="notification-dot"></span></button>
+            <button class="topbar-avatar" aria-label="Mara Bloom account">MB</button>
+          </div>
+        </header>
+
+        <main id="main-content" tabindex="-1">
+          <section class="page-view active" id="view-overview" aria-labelledby="page-title">
+            <div class="page-heading overview-heading">
+              <div>
+                <div class="eyebrow"><span id="workspace-date">WEDNESDAY, SEPTEMBER 23, 2026</span> <span class="eyebrow-line"></span> YOUR MUSIC, IN MOTION</div>
+                <h1 id="page-title">Good morning, Mara <span class="wave">✳</span></h1>
+                <p class="page-lede">A clear view of what’s moving across your releases.</p>
+              </div>
+              <button class="button button-primary" id="new-campaign"><span class="icon icon-plus"></span> New campaign</button>
+            </div>
+
+            <div class="release-banner">
+              <div class="release-cover" aria-hidden="true"><div class="cover-orbit"></div><div class="cover-sun"></div><div class="cover-title">GLASS<br />HOUSE</div><span class="cover-note">MB · 01</span></div>
+              <div class="release-info">
+                <div class="release-overline"><span class="status-dot status-green"></span> NEXT RELEASE <span class="release-overline-divider">·</span> <span id="overview-release-kind">SINGLE</span></div>
+                <h2 id="overview-song-title">Glasshouse</h2>
+                <p>A new <span id="overview-kind-copy">single</span> by <span id="overview-artist-name">Mara Bloom</span> <span class="release-separator">/</span> <span id="overview-release-date">October 23, 2026</span></p>
+                <div class="release-progress-label"><span>Release readiness</span><strong id="overview-readiness-label">—</strong></div>
+                <div class="progress-track"><span id="overview-readiness-bar" style="width:0%"></span></div>
+              </div>
+              <div class="release-countdown"><span>RELEASE IN</span><strong><span id="release-countdown-days">30</span><span id="release-countdown-unit">d</span></strong><button class="text-link" data-go="passport">View Song Passport <span aria-hidden="true">↗</span></button></div>
+            </div>
+
+            <div class="metric-grid">
+              <article class="metric-card"><div class="metric-top"><span>Active campaigns</span><span class="metric-icon icon-spark"></span></div><div class="metric-value" id="active-campaigns">00</div><div class="metric-foot"><span class="metric-marker marker-green"></span><span id="active-campaigns-foot">0 planning · 0 active</span></div></article>
+              <article class="metric-card"><div class="metric-top"><span>Opportunities saved</span><span class="metric-icon icon-bookmark"></span></div><div class="metric-value" id="saved-opportunities">04</div><div class="metric-foot"><span class="metric-marker marker-sand"></span>2 need a closer look</div></article>
+              <article class="metric-card"><div class="metric-top"><span>Approvals to review</span><span class="metric-icon icon-check"></span></div><div class="metric-value" id="pending-approvals">03</div><div class="metric-foot"><span class="metric-marker marker-ink"></span>Your call, before anything moves</div></article>
+              <article class="metric-card"><div class="metric-top"><span>Release readiness</span><span class="metric-icon icon-shield"></span></div><div class="metric-value"><span id="overview-readiness">—</span><span class="metric-unit">%</span></div><div class="metric-foot"><span class="metric-marker marker-green"></span>Advisory completeness only</div></article>
+            </div>
+
+            <div class="content-grid overview-grid">
+              <section class="panel activity-panel">
+                <div class="panel-heading"><div><div class="section-kicker">YOUR WORKSPACE</div><h2>Recent activity</h2></div><button class="icon-button subtle" id="activity-more" aria-label="More activity options"><span class="icon icon-more"></span></button></div>
+                <div class="activity-list" id="activity-list"></div>
+                <button class="panel-link" data-go="campaigns">View all campaigns <span aria-hidden="true">→</span></button>
+              </section>
+
+              <section class="panel signals-panel">
+                <div class="panel-heading signals-heading"><div><div class="section-kicker">CAMPAIGN SIGNALS</div><h2>Measured results</h2></div><span class="not-connected">Not connected</span></div>
+                <div class="signals-empty-state"><span class="connection-icon"><span class="icon icon-chart"></span></span><div><strong>Campaign analytics aren’t connected</strong><p>This prototype cannot read streaming, social, or promotion services. Your recorded replies, placements, and financial lines stay visible in Reports.</p><button class="panel-link" data-go="reports">View recorded outcomes <span aria-hidden="true">→</span></button></div></div>
+              </section>
+            </div>
+
+            <div class="bottom-grid">
+              <section class="panel checklist-panel">
+                <div class="panel-heading"><div><div class="section-kicker">BEFORE RELEASE DAY</div><h2>Next up</h2></div><button class="panel-link compact" data-go="passport">See checklist <span aria-hidden="true">→</span></button></div>
+                <div id="overview-checklist"></div>
+              </section>
+              <section class="panel note-panel">
+                <div class="note-panel-head"><span class="note-glyph">n</span><span class="section-kicker">A NOTE FROM YOUR WORKSPACE</span></div>
+                <h2>Good promotion starts with a good fit.</h2>
+                <p>We’ll surface relevant opportunities, explain why they match, and leave every meaningful decision with you.</p>
+                <button class="panel-link" data-go="opportunities">Explore opportunities <span aria-hidden="true">→</span></button>
+                <span class="note-decoration" aria-hidden="true">✳</span>
+              </section>
+            </div>
+            <footer class="page-footer"><span>NOTE <span class="footer-dot">·</span> Promotion</span><span>Built around your music and your decisions.</span><span>Fictional opportunities · local demo records</span></footer>
+          </section>
+
+          <section class="page-view" id="view-campaigns" aria-labelledby="campaigns-title">
+            <div class="page-heading"><div><div class="eyebrow">PLAN WITH INTENTION</div><h1 id="campaigns-title">Campaigns</h1><p class="page-lede">Bring every release plan, opportunity, and next step into one place.</p></div><button class="button button-primary" id="new-campaign-alt"><span class="icon icon-plus"></span> New campaign</button></div>
+            <div class="filter-row"><div class="filter-tabs" role="tablist" aria-label="Campaign filters"><button class="filter-tab active" data-campaign-filter="all" role="tab" aria-selected="true">All <span id="all-campaign-count">2</span></button><button class="filter-tab" data-campaign-filter="Active" role="tab" aria-selected="false">Active plans</button><button class="filter-tab" data-campaign-filter="Paused" role="tab" aria-selected="false">Paused</button><button class="filter-tab" data-campaign-filter="Planning" role="tab" aria-selected="false">Planning</button><button class="filter-tab" data-campaign-filter="Stopped" role="tab" aria-selected="false">Stopped</button><button class="filter-tab" data-campaign-filter="Completed" role="tab" aria-selected="false">Completed</button></div><button class="select-button" id="sort-campaigns">Recently updated <span class="icon icon-chevron"></span></button></div>
+            <div class="campaign-list" id="campaign-list"></div>
+            <div class="inline-notice"><span class="icon icon-shield"></span><span>Creating a campaign organizes your plan. Any external outreach, spend, or commitments need your separate approval.</span></div>
+          </section>
+
+          <section class="page-view" id="view-passport" aria-labelledby="passport-title">
+            <div class="page-heading"><div><div class="eyebrow">YOUR RELEASE, CLEARLY DOCUMENTED</div><h1 id="passport-title">Song Passport</h1><p class="page-lede">A single source of truth for your release details, assets, and readiness.</p></div><button class="button button-secondary" id="edit-passport"><span class="icon icon-edit"></span> Edit release details</button></div>
+            <div class="passport-hero panel"><div class="passport-cover release-cover"><div class="cover-orbit"></div><div class="cover-sun"></div><div class="cover-title">GLASS<br />HOUSE</div><span class="cover-note">MB · 01</span></div><div class="passport-main"><div class="release-overline"><span class="status-dot status-green"></span> UPCOMING <span id="passport-kind-label">SINGLE</span></div><h2 id="passport-song-title">Glasshouse</h2><p class="passport-byline" id="passport-artist-line">Mara Bloom <span>·</span> Indie pop <span>·</span> 2026</p><p class="passport-description" id="passport-description">A late-night song about finding your way back to yourself.</p><div class="passport-tags"><span id="passport-genre-tag">Indie pop</span><span id="passport-language-tag">English</span><span id="passport-explicit-tag">Clean lyrics</span></div></div><div class="passport-date"><span>RELEASE DATE</span><strong id="passport-date"><span>OCT</span> <b>23</b></strong><small id="passport-weekday">Friday, 2026</small></div></div>
+            <div class="passport-layout"><div class="passport-content panel"><div class="panel-heading passport-panel-heading"><div><div class="section-kicker">RELEASE INFORMATION</div><h2 id="passport-glance-title">Glasshouse, at a glance</h2></div><span class="complete-pill"><span class="status-dot status-green"></span> Artist-entered</span></div><div class="passport-sections"><section class="passport-section"><div class="passport-section-icon"><span class="icon icon-music"></span></div><div class="passport-section-body"><h3>Track details</h3><p>Track title, contributors, genre, and release date.</p><div class="detail-pairs"><div><span>Primary artist</span><strong id="detail-artist">Mara Bloom</strong></div><div><span>Release type</span><strong id="detail-kind">Single</strong></div><div><span>Genre</span><strong id="detail-genre">Indie pop</strong></div><div><span>Duration</span><strong id="detail-duration">3:42</strong></div><div><span>ISRC · recording</span><strong id="detail-isrc">Not added</strong></div><div><span>ISWC · composition</span><strong id="detail-iswc">Not added</strong></div><div><span>UPC / EAN · release</span><strong id="detail-upc">Not added</strong></div><div><span>Explicit content</span><strong id="detail-explicit">No</strong></div><div><span>Contributors</span><strong id="detail-contributors">Mara Bloom — songwriter, vocals; Ellis Park — producer</strong></div><div><span>Master ownership</span><strong id="detail-master-ownership">Artist-reported; not verified</strong></div><div><span>Samples / covers / remixes</span><strong id="detail-sample-status">Not declared</strong></div></div></div><span class="section-complete"><span class="icon icon-info"></span> Not independently verified</span></section>
+            <section class="passport-section"><div class="passport-section-icon icon-audio"><span class="icon icon-wave"></span></div><div class="passport-section-body"><h3>Audio &amp; artwork</h3><p>Asset upload and secure storage are not enabled in this local prototype.</p><div class="asset-row"><span class="asset-file-icon"><span class="icon icon-wave"></span></span><span class="asset-copy"><strong>Audio master</strong><small>No file uploaded or stored</small></span><span class="asset-ready">Unavailable</span></div><div class="asset-row missing-asset"><span class="asset-file-icon"><span class="icon icon-image"></span></span><span class="asset-copy"><strong>Clean version note</strong><small>Not added</small></span><button class="text-link" id="add-clean">Add note <span aria-hidden="true">+</span></button></div></div><span class="section-complete section-optional">Optional asset</span></section>
+            <section class="passport-section"><div class="passport-section-icon icon-rights"><span class="icon icon-lock"></span></div><div class="passport-section-body"><h3>Rights &amp; credits</h3><p>Understand what can be promoted and who needs to be credited.</p><div class="rights-status"><span class="rights-badge" id="rights-confirmation-badge"><span class="icon icon-check"></span> Artist confirmed</span><span id="rights-summary">Ownership details self-reported by the artist</span></div></div><button class="text-link" id="rights-info">Review <span aria-hidden="true">→</span></button></section>
+            <section class="passport-section"><div class="passport-section-icon icon-links"><span class="icon icon-link"></span></div><div class="passport-section-body"><h3>Release links</h3><p>Save an artist-provided link for reference. Adding a link does not submit it anywhere.</p><div class="link-row"><span class="link-platform spotify-mark">↗</span><span class="link-url" id="release-link-display">No artist-provided link added</span><span class="link-status">Artist provided</span></div></div><button class="text-link" id="add-link">Add link <span aria-hidden="true">+</span></button></section></div></div>
+              <aside class="passport-side"><section class="panel readiness-card"><div class="section-kicker">OPTIONAL RELEASE READINESS CHECK</div><div class="readiness-score"><div class="score-ring"><div class="score-inner"><strong id="readiness-score-number">—</strong><small id="readiness-score-word">NOT RUN</small></div></div><div class="score-copy"><strong>Advisory only</strong><p id="readiness-summary">Run the optional check for missing details.</p></div></div><div class="score-line"><span>Essentials</span><span id="readiness-label">0 of 6 essentials recorded</span><div class="mini-progress"><i id="readiness-bar" style="width:0%"></i></div></div><div class="readiness-findings" id="readiness-findings"><p class="readiness-empty">Run the optional check to see missing details and practical next steps.</p></div><button class="button button-secondary readiness-run" id="run-readiness" type="button">Run optional check</button><div class="readiness-foot"><span class="icon icon-info"></span> Guidance is not legal clearance or a guarantee of campaign results.</div></section>
+              <section class="panel passport-help"><span class="help-icon"><span class="icon icon-chat"></span></span><h3>Not sure about something?</h3><p>Your manager can help check release details with you.</p><button class="panel-link" id="ask-manager">Ask your team <span aria-hidden="true">→</span></button></section></aside></div>
+          </section>
+
+          <section class="page-view" id="view-opportunities" aria-labelledby="opportunities-title">
+            <div class="page-heading"><div><div class="eyebrow">FIND THE RIGHT NEXT STEP</div><h1 id="opportunities-title">Opportunities</h1><p class="page-lede">A considered shortlist of places your music could belong.</p></div><button class="button button-secondary" id="opportunity-info"><span class="icon icon-info"></span> How matching works</button></div>
+            <div class="opportunity-intro"><span class="opportunity-spark">✳</span><div><strong>Matched to “<span id="opportunity-release-label">Glasshouse</span>”</strong><p>Based on your sound, release timing, audience, and stated preferences.</p></div><span class="matched-count">06 SAMPLE OPPORTUNITIES</span></div>
+            <div class="filter-row opportunity-filters"><div class="filter-tabs" role="tablist" aria-label="Opportunity categories"><button class="filter-tab active" data-opportunity-filter="All" role="tab" aria-selected="true">All</button><button class="filter-tab" data-opportunity-filter="Editorial" role="tab" aria-selected="false">Editorial</button><button class="filter-tab" data-opportunity-filter="Radio" role="tab" aria-selected="false">Radio</button><button class="filter-tab" data-opportunity-filter="Live" role="tab" aria-selected="false">Live &amp; events</button></div><button class="select-button" id="opportunity-sort">Best fit <span class="icon icon-chevron"></span></button></div>
+            <div class="opportunity-list" id="opportunity-list"></div>
+            <div class="inline-notice"><span class="icon icon-shield"></span><span>We’ll never pitch your music, promise a placement, or pay a fee without your explicit approval.</span></div>
+          </section>
+
+          <section class="page-view" id="view-approvals" aria-labelledby="approvals-title">
+            <div class="page-heading"><div><div class="eyebrow">YOUR DECISION, YOUR TIMING</div><h1 id="approvals-title">Approvals</h1><p class="page-lede">Review what’s proposed before any action is taken on your behalf.</p></div><span class="approval-policy"><span class="icon icon-shield"></span> Nothing moves without you</span></div>
+            <div class="approval-summary"><div class="approval-summary-copy"><span class="approval-summary-icon"><span class="icon icon-check"></span></span><div><strong id="approval-summary-count">3 items need your review</strong><span>Take a look when you’re ready. You can also leave anything for later.</span></div></div><span class="demo-tag">SAMPLE REQUESTS</span></div>
+            <div class="approval-list" id="approval-list"></div>
+            <section class="activity-audit panel"><div class="panel-heading"><div><div class="section-kicker">YOUR DECISION HISTORY</div><h2>Recent decisions</h2></div><span class="privacy-note"><span class="icon icon-lock"></span> Visible to your team</span></div><div id="audit-list"></div></section>
+          </section>
+
+          <section class="page-view" id="view-reports" aria-labelledby="reports-title">
+            <div class="page-heading"><div><div class="eyebrow">LEARN WHAT RESONATES</div><h1 id="reports-title">Reports</h1><p class="page-lede">See the signals you can act on, with context about what they mean.</p></div><button class="button button-secondary" id="export-report"><span class="icon icon-download"></span> Export workspace data</button></div>
+            <div class="report-notice"><span class="icon icon-info"></span><div><strong>Only recorded information is shown</strong><span>No streaming, audience, placement, or revenue services are connected. Results are not inferred from activity volume.</span></div></div>
+            <div class="report-metrics"><article class="report-card"><span>Qualified actions</span><strong id="report-qualified">0</strong><small>No compliant adapters are connected</small></article><article class="report-card"><span>Responses</span><strong id="report-responses">0</strong><small>Recorded replies only</small></article><article class="report-card"><span>Recorded placements</span><strong id="report-placements">0</strong><small>Verification status shown per entry</small></article><article class="report-card"><span>Verified revenue</span><strong id="report-revenue">€0.00</strong><small>Only imported, verified lines count</small></article></div>
+            <section class="panel outcome-panel"><div class="panel-heading"><div><div class="section-kicker">RELEASE OUTCOMES</div><h2>Responses, placements &amp; revenue</h2><p class="page-lede">Keep activity, acceptance, publication, usage, and money separate.</p></div><button class="button button-secondary" id="record-outcome" type="button">Record an outcome</button></div><div id="outcome-list" class="outcome-list"></div><div class="report-explainer">Manual entries show their source and verification status. Estimated revenue is never presented as paid or receivable.</div></section>
+            <section class="panel report-insight"><span class="insight-icon"><span class="icon icon-spark"></span></span><div><div class="section-kicker">DATA PROVENANCE</div><h2>Activity, response, placement, usage, and revenue are separate.</h2><p>Every manually recorded outcome keeps its source and verification label. Nothing is estimated from a message count.</p></div></section>
+          </section>
+
+          <section class="page-view" id="view-settings" aria-labelledby="settings-title">
+            <div class="page-heading"><div><div class="eyebrow">YOUR WORKSPACE, YOUR RULES</div><h1 id="settings-title">Settings</h1><p class="page-lede">Manage your profile, team, and the way NOTE can act for you.</p></div></div>
+            <div class="settings-layout"><nav class="settings-nav" aria-label="Settings sections"><a href="#artist-settings" class="selected">Artist profile</a><a href="#team-settings">Team access</a><a href="#connections-settings">Connections</a><a href="#permissions-settings">Approval boundaries</a></nav><div class="settings-content"><section class="panel settings-panel" id="artist-settings"><div class="panel-heading"><div><div class="section-kicker">PUBLIC PROFILE</div><h2>Artist profile</h2></div><button class="text-link" id="settings-edit-profile">Edit profile <span aria-hidden="true">→</span></button></div><div class="settings-profile-row"><span class="settings-artist-avatar">MB</span><div><strong id="settings-artist-name">Mara Bloom</strong><span id="settings-artist-genre">Independent artist · Indie pop</span></div></div><div class="settings-detail-row"><span>Artist story</span><strong id="settings-bio">No artist story added yet.</strong></div><div class="settings-detail-row"><span>Home territory</span><strong id="settings-market">Not set</strong></div><div class="settings-detail-row"><span>Working languages</span><strong id="settings-languages">Not set</strong></div><div class="settings-detail-row"><span>Prohibited contexts</span><strong id="settings-boundaries">No prohibited contexts added.</strong></div><div class="settings-detail-row"><span>Release preferences</span><strong>Artist approval before external contact; spending and rights actions always need separate approval.</strong></div></section>
+            <section class="panel settings-panel" id="team-settings"><div class="panel-heading"><div><div class="section-kicker">WORKING TOGETHER</div><h2>Team access</h2></div><button class="text-link" id="invite-team">Invite teammate <span aria-hidden="true">+</span></button></div><div class="team-row"><span class="team-avatar avatar-artist">MB</span><span class="team-person"><strong>Mara Bloom</strong><small>Owner · All permissions</small></span><span class="you-tag">YOU</span></div><div class="team-row"><span class="team-avatar avatar-manager">EP</span><span class="team-person"><strong>Ellis Park</strong><small>Manager · Campaign planning</small></span><span class="permission-tag">Can prepare requests</span></div></section>
+            <section class="panel settings-panel" id="connections-settings"><div class="panel-heading"><div><div class="section-kicker">YOUR CONNECTED SERVICES</div><h2>Connections</h2></div></div><div class="connection-empty"><span class="connection-icon"><span class="icon icon-link"></span></span><div><strong>No services connected</strong><p>Choose what you connect. NOTE won't post, send, or spend through a service until you grant access.</p></div><span class="not-connected">Not connected</span></div></section>
+            <section class="panel settings-panel" id="permissions-settings"><div class="panel-heading"><div><div class="section-kicker">ACTION PERMISSIONS</div><h2>Approval boundaries</h2></div><span class="permission-status"><span class="status-dot status-green"></span> Active</span></div><div class="permission-list"><div><span class="icon icon-check"></span><span>Prepare campaign drafts</span><span class="permission-value">Allowed</span></div><div><span class="icon icon-check"></span><span>Save opportunities for review</span><span class="permission-value">Allowed</span></div><div><span class="icon icon-lock"></span><span>Send outreach or publish content</span><span class="permission-value locked">Approval required</span></div><div><span class="icon icon-lock"></span><span>Spend, sign, or license</span><span class="permission-value locked">Approval required</span></div></div><p class="settings-footnote">These boundaries apply to any real integrations added later.</p></section></div></div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="modal-backdrop" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-description">
+        <div class="modal-head"><span class="modal-icon" id="modal-icon"><span class="icon icon-spark"></span></span><button class="icon-button" id="modal-close" aria-label="Close dialog"><span class="icon icon-close"></span></button></div>
+        <div id="modal-content"></div>
+      </section>
+    </div>
+    <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
