@@ -7,6 +7,7 @@ no user accounts, cloud database, external integrations, or outbound actions.
 from __future__ import annotations
 
 import argparse
+from contextlib import closing
 import json
 import os
 import re
@@ -33,7 +34,7 @@ def default_database_path() -> Path:
 
 def initialize_database(database_path: Path) -> None:
     database_path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(database_path) as connection:
+    with closing(sqlite3.connect(database_path)) as connection, connection:
         connection.execute(
             """
             CREATE TABLE IF NOT EXISTS demo_state (
@@ -370,7 +371,7 @@ def create_handler(database_path: Path):
                 self._send_json(200, {"ok": True})
                 return
             if path == "/api/state":
-                with sqlite3.connect(database_path) as connection:
+                with closing(sqlite3.connect(database_path)) as connection, connection:
                     row = connection.execute(
                         "SELECT payload, updated_at FROM demo_state WHERE id = 1"
                     ).fetchone()
@@ -418,7 +419,7 @@ def create_handler(database_path: Path):
                 return
 
             encoded_state = json.dumps(state, ensure_ascii=False, separators=(",", ":"))
-            with sqlite3.connect(database_path) as connection:
+            with closing(sqlite3.connect(database_path)) as connection, connection:
                 connection.execute(
                     """
                     INSERT INTO demo_state (id, payload, updated_at)
